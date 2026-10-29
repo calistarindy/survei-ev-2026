@@ -1,0 +1,1906 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Survei Perilaku dan Kebutuhan Pengguna Kendaraan Listrik</title>
+<meta name="description" content="Survei perilaku dan kebutuhan pengguna kendaraan listrik. Sekitar 7 menit, sebagian besar tinggal pilih jawaban.">
+<meta name="theme-color" content="#2340FF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF0FF; --surface:#FFFFFF; --ink:#141B3D; --muted:#56608A; --line:#CFD8F6;
+  --volt:#2340FF; --volt-deep:#1428B8; --volt-ink:#FFFFFF;
+  --spark:#FFD23F; --spark-deep:#D9A800; --full:#1FC48A; --low:#FF6B5B; --focus:#FF8A00;
+  --press:0 4px 0 #BCC8F0;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1433; --surface:#18204F; --ink:#F1F3FF; --muted:#AEB7DE; --line:#2D3A80;
+    --volt:#7487FF; --volt-deep:#4A5CDB; --volt-ink:#0E1433;
+    --spark:#FFD23F; --spark-deep:#B88E00; --full:#3BE0A8; --low:#FF8577; --focus:#FFB24A;
+    --press:0 4px 0 #080C24;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1433; --surface:#18204F; --ink:#F1F3FF; --muted:#AEB7DE; --line:#2D3A80;
+  --volt:#7487FF; --volt-deep:#4A5CDB; --volt-ink:#0E1433;
+  --spark:#FFD23F; --spark-deep:#B88E00; --full:#3BE0A8; --low:#FF8577; --focus:#FFB24A;
+  --press:0 4px 0 #080C24;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:12px}
+
+/* Bilah atas: baterai yang terisi seiring jawaban */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 20px 10px}
+.battery{display:flex;align-items:center}
+.cell{position:relative;width:150px;height:40px;border:3px solid var(--ink);border-radius:11px;padding:3px;overflow:hidden;background:var(--surface)}
+.fill{height:100%;width:0;border-radius:6px;background:var(--low);transition:width .5s cubic-bezier(.2,.8,.2,1),background-color .4s}
+.bolt{position:absolute;inset:0;margin:auto;width:20px;height:26px;fill:var(--ink);opacity:.85}
+.cap{width:7px;height:16px;background:var(--ink);border-radius:0 4px 4px 0;margin-left:2px}
+.pct{font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:19px;min-width:4.2ch}
+.demo{max-width:540px;margin:0 auto 4px;padding:0 20px;font-size:13px;color:var(--muted);text-align:center}
+
+.wrap{max-width:540px;margin:0 auto;padding:4px 20px 140px}
+
+/* Layar pembuka */
+.hero{text-align:center;padding-top:8px}
+.mascot{width:150px;height:150px;display:block;margin:6px auto 0}
+.hero h1{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:31px;line-height:1.05;margin:8px 0 12px;letter-spacing:-.01em}
+.hero p{margin:0 auto 10px;max-width:34ch;color:var(--muted)}
+.facts{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.facts li{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600}
+.consent{display:flex;gap:12px;align-items:flex-start;text-align:left;margin:20px 0 0;padding:14px 16px;background:var(--surface);border:2px solid var(--line);border-radius:16px;font-weight:600;cursor:pointer}
+.consent input{width:26px;height:26px;margin:0;flex:none;accent-color:var(--volt)}
+.small{font-size:14px;color:var(--muted);margin-top:14px}
+
+/* Pertanyaan */
+.sec{margin:14px 0 6px;font-size:15px;font-weight:700;color:var(--volt)}
+.q-title{font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:27px;line-height:1.15;margin:0 0 6px}
+.q-title:focus{outline:none}
+.hint{margin:0 0 4px;color:var(--muted);font-size:15px}
+.opts{display:grid;gap:12px;margin-top:18px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:12px 16px;text-align:left;
+  background:var(--surface);border:2px solid var(--line);border-radius:18px;box-shadow:var(--press);
+  font-weight:600;font-size:17px;transition:transform .08s,box-shadow .08s,background-color .15s}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:var(--volt-ink);box-shadow:0 4px 0 var(--volt-deep)}
+.opt[disabled]{opacity:.45;cursor:not-allowed}
+.emo{font-size:26px;width:34px;text-align:center;flex:none;line-height:1}
+.tick{margin-left:auto;flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:15px}
+.opt[aria-pressed="true"] .tick{border-color:var(--volt-ink);background:var(--volt-ink);color:var(--volt)}
+.multi .tick{border-radius:8px}
+.card{align-items:flex-start;padding:16px}
+.card .emo{font-size:32px;width:40px}
+.card-t{font-family:"Baloo 2",system-ui,sans-serif;font-size:21px;font-weight:700;line-height:1.15;display:block}
+.card-l{display:block;font-weight:500;font-size:15px;opacity:.85;margin-top:2px}
+.count{margin-top:12px;font-size:15px;font-weight:600;color:var(--muted)}
+.grow{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:14px}
+.grow.done{border-color:var(--volt)}
+.glabel{margin:0 0 10px;font-weight:700}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:9px 14px;min-height:44px;border:2px solid var(--line);border-radius:999px;background:var(--bg);font-size:15px;font-weight:600}
+.pills.likert{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pills.likert .pill{padding:6px 0;min-height:52px;text-align:center;font-family:"Baloo 2",system-ui,sans-serif;font-size:24px;font-weight:700;border-radius:14px}
+.ends{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:13px;color:var(--muted);font-weight:600}
+.pill[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:var(--volt-ink)}
+.field{width:100%;margin-top:18px;padding:14px 16px;font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:16px}
+.field:focus{border-color:var(--volt);outline:none}
+textarea.field{min-height:120px;resize:vertical}
+.err{color:var(--low);font-weight:600;font-size:15px;margin-top:8px}
+
+/* Layar konsep layanan */
+.konsep-ilus{display:block;width:100%;max-width:340px;height:auto;margin:14px auto 4px}
+.konsep-isi{color:var(--muted);margin:0 0 6px}
+.feats{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+.feat{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px}
+.feat .emo{font-size:28px}
+.feat-t{display:block;font-family:"Baloo 2",system-ui,sans-serif;font-weight:700;font-size:20px;line-height:1.2}
+.feat-d{display:block;font-size:15px;color:var(--muted)}
+
+/* Navigasi bawah */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--bg);border-top:2px solid var(--line);
+  padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px))}
+.nav-in{max-width:540px;margin:0 auto;display:flex;gap:12px;align-items:center}
+.back{background:none;border:none;padding:12px 8px;font-weight:700;color:var(--muted);min-height:52px}
+.next{flex:1;min-height:56px;border:none;border-radius:18px;background:var(--spark);color:#141B3D;
+  font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:21px;box-shadow:0 4px 0 var(--spark-deep);transition:transform .08s,box-shadow .08s}
+.next:active{transform:translateY(3px);box-shadow:none}
+.next[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 4px 0 var(--spark-deep)}
+
+/* Layar akhir */
+.end{text-align:center;padding-top:20px}
+.end h1{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:36px;line-height:1.05;margin:10px 0}
+.end p{color:var(--muted);max-width:34ch;margin:0 auto 10px}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:20}
+.confetti i{position:absolute;top:-24px;width:10px;height:16px;border-radius:3px;animation:fall 1.9s cubic-bezier(.3,.6,.4,1) forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.9}}
+
+/* Panel admin */
+.admin{padding-top:20px}
+.admin h1{font-family:"Baloo 2",system-ui,sans-serif;font-size:32px;margin:0 0 8px}
+.admin label{display:block;font-weight:700;margin-top:18px}
+.btn{margin-top:16px;width:100%;min-height:56px;border:none;border-radius:18px;background:var(--volt);color:var(--volt-ink);font-weight:700;font-size:18px;box-shadow:0 4px 0 var(--volt-deep)}
+.status{margin-top:14px;font-weight:600}
+
+@media (min-width:600px){.q-title{font-size:31px}.hero h1{font-size:40px}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="battery" role="progressbar" aria-label="Kemajuan survei" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="cell"><div class="fill" id="fill"></div>
+      <svg class="bolt" viewBox="0 0 20 26" aria-hidden="true"><path d="M12 0 1 15h7l-2 11 13-16h-8z"/></svg>
+    </div>
+    <div class="cap"></div>
+  </div>
+  <span class="pct" id="pct">0%</span>
+</header>
+<p class="demo" id="demo" hidden>Mode uji: jawaban belum terhubung ke spreadsheet.</p>
+<main class="wrap" id="app" aria-live="polite"></main>
+<nav class="nav" id="nav" hidden><div class="nav-in" id="navIn"></div></nav>
+
+<script>
+/* ===== Pengaturan: ubah dua baris ini sebelum disebar ===== */
+const KONFIG = {
+  // Tempel URL Web App dari Apps Script (berakhiran /exec). Kosong = mode uji.
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyR_T5dhA_rV8YycTGdp_fC_1yeWO3dtWaPwbZtvkw0a0EhkxSo8oOiEqV5m01wz70k/exec'
+};
+/* ========================================================= */
+
+const Q = [
+ {
+  "id": "A1",
+  "key": "A1_kendaraan",
+  "sec": "Profil singkat",
+  "path": "all",
+  "type": "single",
+  "hint": "Bila punya keduanya, jawablah untuk kendaraan yang paling sering Anda pakai",
+  "text": "Kendaraan listrik apa yang Anda pakai?",
+  "options": [
+   {
+    "v": "Mobil listrik",
+    "e": "🚗"
+   },
+   {
+    "v": "Motor listrik",
+    "e": "🛵"
+   },
+   {
+    "v": "Mobil dan motor listrik",
+    "e": "🚗"
+   },
+   {
+    "v": "Saya belum pakai kendaraan listrik",
+    "e": "⛽",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "A2",
+  "key": "A2_tujuan",
+  "sec": "Profil singkat",
+  "path": "ev",
+  "type": "single",
+  "text": "Untuk apa Anda terutama memakai kendaraan listrik?",
+  "options": [
+   {
+    "v": "Pribadi atau keluarga"
+   },
+   {
+    "v": "Bekerja sebagai driver online"
+   },
+   {
+    "v": "Usaha atau operasional kantor"
+   },
+   {
+    "v": "Campuran pribadi dan kerja online"
+   }
+  ]
+ },
+ {
+  "id": "A3",
+  "key": "A3_usia",
+  "sec": "Profil singkat",
+  "path": "ev",
+  "type": "single",
+  "text": "Berapa usia Anda?",
+  "options": [
+   {
+    "v": "Di bawah 25 tahun"
+   },
+   {
+    "v": "25 sampai 34 tahun"
+   },
+   {
+    "v": "35 sampai 44 tahun"
+   },
+   {
+    "v": "45 sampai 54 tahun"
+   },
+   {
+    "v": "55 tahun atau lebih"
+   },
+   {
+    "v": "Tidak ingin menjawab"
+   }
+  ]
+ },
+ {
+  "id": "A4",
+  "key": "A4_wilayah",
+  "sec": "Profil singkat",
+  "path": "ev",
+  "type": "single",
+  "text": "Di wilayah mana Anda paling sering memakai kendaraan?",
+  "options": [
+   {
+    "v": "Jakarta"
+   },
+   {
+    "v": "Bogor atau Depok"
+   },
+   {
+    "v": "Tangerang atau Tangsel"
+   },
+   {
+    "v": "Bekasi"
+   },
+   {
+    "v": "Bandung"
+   },
+   {
+    "v": "Semarang atau Yogyakarta"
+   },
+   {
+    "v": "Surabaya"
+   },
+   {
+    "v": "Kota lain"
+   }
+  ]
+ },
+ {
+  "id": "B1",
+  "key": "B1_tempat_utama",
+  "sec": "Kebiasaan ngecas",
+  "path": "ev",
+  "type": "single",
+  "text": "Di mana Anda paling sering mengisi daya?",
+  "options": [
+   {
+    "v": "Di rumah",
+    "e": "🏠"
+   },
+   {
+    "v": "Di tempat kerja atau kantor",
+    "e": "🏢"
+   },
+   {
+    "v": "Di charger umum (SPKLU, mal, SPBU, dan sejenisnya)",
+    "e": "⚡"
+   },
+   {
+    "v": "Tukar baterai di stasiun",
+    "e": "🔋"
+   },
+   {
+    "v": "Sama seringnya di beberapa tempat",
+    "e": "🔁"
+   }
+  ]
+ },
+ {
+  "id": "B2",
+  "key": "B2_kondisi_rumah",
+  "sec": "Kebiasaan ngecas",
+  "path": "ev",
+  "type": "single",
+  "text": "Bagaimana kondisi mengisi daya di rumah Anda?",
+  "options": [
+   {
+    "v": "Bisa, lancar"
+   },
+   {
+    "v": "Bisa, tapi dayanya terbatas atau colokan jauh"
+   },
+   {
+    "v": "Tidak bisa, tinggal di apartemen atau kontrakan"
+   },
+   {
+    "v": "Tidak bisa, tidak ada tempat parkir sendiri"
+   },
+   {
+    "v": "Belum pasang charger di rumah"
+   }
+  ]
+ },
+ {
+  "id": "B3",
+  "key": "B3_frekuensi_umum",
+  "sec": "Kebiasaan ngecas",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam seminggu, berapa kali Anda mengisi daya di charger umum?",
+  "options": [
+   {
+    "v": "Tidak pernah"
+   },
+   {
+    "v": "Kurang dari 1 kali seminggu"
+   },
+   {
+    "v": "1 sampai 2 kali"
+   },
+   {
+    "v": "3 sampai 4 kali"
+   },
+   {
+    "v": "5 kali atau lebih"
+   }
+  ]
+ },
+ {
+  "id": "J1",
+  "key": "J1_jam",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "max": 2,
+  "hint": "Pilih maksimal 2",
+  "text": "Biasanya jam berapa Anda mengisi daya di charger umum?",
+  "options": [
+   {
+    "v": "Dini hari (00.00–05.00)",
+    "e": "🌌"
+   },
+   {
+    "v": "Pagi (05.00–10.00)",
+    "e": "🌅"
+   },
+   {
+    "v": "Siang (10.00–15.00)",
+    "e": "☀️"
+   },
+   {
+    "v": "Sore (15.00–19.00)",
+    "e": "🌇"
+   },
+   {
+    "v": "Malam (19.00–24.00)",
+    "e": "🌙"
+   }
+  ]
+ },
+ {
+  "id": "J2",
+  "key": "J2_lama_ngecas",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Sekali mengisi daya di charger umum, biasanya berapa lama Anda berada di lokasi?",
+  "options": [
+   {
+    "v": "Kurang dari 15 menit"
+   },
+   {
+    "v": "15 sampai 30 menit"
+   },
+   {
+    "v": "30 sampai 60 menit"
+   },
+   {
+    "v": "1 sampai 2 jam"
+   },
+   {
+    "v": "Lebih dari 2 jam"
+   }
+  ]
+ },
+ {
+  "id": "J3",
+  "key": "J3_penentu_lokasi",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "shuffle": true,
+  "text": "Apa yang paling menentukan pilihan lokasi charger umum Anda?",
+  "options": [
+   {
+    "v": "Dekat rute atau tujuan saya",
+    "e": "📍"
+   },
+   {
+    "v": "Charger pasti tersedia",
+    "e": "✅"
+   },
+   {
+    "v": "Harga lebih murah",
+    "e": "💸"
+   },
+   {
+    "v": "Pengisian lebih cepat",
+    "e": "⚡"
+   },
+   {
+    "v": "Ada tempat makan atau belanja di sekitar",
+    "e": "🛍️"
+   },
+   {
+    "v": "Tempatnya aman dan nyaman",
+    "e": "🛡️"
+   },
+   {
+    "v": "Sudah terbiasa di sana",
+    "e": "🔁"
+   },
+   {
+    "v": "Tidak ada yang spesifik",
+    "e": "🤷",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "J4",
+  "key": "J4_kondisi_tiba",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Saat terakhir kali tiba di charger umum, bagaimana kondisinya?",
+  "options": [
+   {
+    "v": "Charger langsung kosong"
+   },
+   {
+    "v": "Menunggu kurang dari 10 menit"
+   },
+   {
+    "v": "Menunggu 10 sampai 30 menit"
+   },
+   {
+    "v": "Menunggu lebih dari 30 menit"
+   },
+   {
+    "v": "Charger rusak atau tidak bisa dipakai, saya pindah lokasi"
+   },
+   {
+    "v": "Saya tidak ingat",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "J5",
+  "key": "J5",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "grid",
+  "likert": {
+   "min": "Sangat sulit",
+   "max": "Sangat mudah"
+  },
+  "hint": "Pilih angka 1–4 untuk tiap baris. 1 = Sangat sulit, 2 = Cukup sulit, 3 = Cukup mudah, 4 = Sangat mudah",
+  "text": "Seberapa mudah tahap-tahap ini bagi Anda saat mengisi daya di charger umum?",
+  "rows": [
+   {
+    "k": "cari_lokasi",
+    "v": "Mencari charger yang cocok"
+   },
+   {
+    "k": "cek_ketersediaan",
+    "v": "Mengecek apakah charger tersedia"
+   },
+   {
+    "k": "menunggu_giliran",
+    "v": "Menunggu giliran"
+   },
+   {
+    "k": "mulai_isi",
+    "v": "Memulai pengisian (colok dan aktivasi)"
+   },
+   {
+    "k": "membayar",
+    "v": "Membayar"
+   },
+   {
+    "k": "menunggu_selesai",
+    "v": "Menunggu sampai pengisian selesai"
+   }
+  ],
+  "cols": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ]
+ },
+ {
+  "id": "J6",
+  "key": "J6_saat_menunggu",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Saat menunggu pengisian daya, biasanya Anda...",
+  "options": [
+   {
+    "v": "Tetap di kendaraan sambil memegang HP",
+    "e": "📱"
+   },
+   {
+    "v": "Makan atau minum",
+    "e": "☕"
+   },
+   {
+    "v": "Belanja atau jalan di sekitar",
+    "e": "🛍️"
+   },
+   {
+    "v": "Istirahat atau tidur",
+    "e": "😴"
+   },
+   {
+    "v": "Mengecek aplikasi kerja atau order",
+    "e": "💼"
+   },
+   {
+    "v": "Ngobrol dengan orang lain",
+    "e": "💬"
+   },
+   {
+    "v": "Ke toilet atau musala",
+    "e": "🚻"
+   },
+   {
+    "v": "Pergi dulu dan kembali nanti",
+    "e": "🚶"
+   },
+   {
+    "v": "Menunggu saja tanpa melakukan apa pun",
+    "e": "⏳",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "J7",
+  "key": "J7_tempat_dikunjungi",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Di sekitar charger umum, tempat apa yang biasanya Anda kunjungi?",
+  "options": [
+   {
+    "v": "Kafe atau kedai kopi",
+    "e": "☕"
+   },
+   {
+    "v": "Restoran atau warung makan",
+    "e": "🍜"
+   },
+   {
+    "v": "Minimarket",
+    "e": "🏪"
+   },
+   {
+    "v": "Mal atau pusat belanja",
+    "e": "🏬"
+   },
+   {
+    "v": "Toko ritel lain",
+    "e": "🛒"
+   },
+   {
+    "v": "Bengkel atau cuci kendaraan",
+    "e": "🛠️"
+   },
+   {
+    "v": "Apotek",
+    "e": "💊"
+   },
+   {
+    "v": "Tempat ibadah",
+    "e": "🕌"
+   },
+   {
+    "v": "Tidak mengunjungi tempat apa pun",
+    "e": "🙅",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "J8",
+  "key": "J8_belanja",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Rata-rata, berapa uang yang Anda belanjakan di sekitar charger setiap kali mengisi daya?",
+  "options": [
+   {
+    "v": "Tidak belanja"
+   },
+   {
+    "v": "Kurang dari Rp25 ribu"
+   },
+   {
+    "v": "Rp25–50 ribu"
+   },
+   {
+    "v": "Rp50–100 ribu"
+   },
+   {
+    "v": "Lebih dari Rp100 ribu"
+   }
+  ]
+ },
+ {
+  "id": "J9",
+  "key": "J9_paling_mengganggu",
+  "sec": "Saat ngecas di tempat umum",
+  "path": "ev",
+  "when": {
+   "id": "B3",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Dalam 6 bulan terakhir, hal apa yang paling mengganggu Anda di charger umum?",
+  "options": [
+   {
+    "v": "Harus antre",
+    "e": "⏳"
+   },
+   {
+    "v": "Charger rusak atau tidak bisa dipakai",
+    "e": "🔧"
+   },
+   {
+    "v": "Charger terpakai oleh kendaraan yang sudah selesai tetapi belum dipindah",
+    "e": "🚙"
+   },
+   {
+    "v": "Lokasi sulit dicari",
+    "e": "🗺️"
+   },
+   {
+    "v": "Aplikasi atau pembayaran gagal",
+    "e": "📲"
+   },
+   {
+    "v": "Biaya terasa mahal",
+    "e": "💸"
+   },
+   {
+    "v": "Tempat menunggu tidak nyaman",
+    "e": "🥵"
+   },
+   {
+    "v": "Merasa kurang aman",
+    "e": "🌚"
+   },
+   {
+    "v": "Tidak ada yang mengganggu",
+    "e": "👌",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "B4",
+  "key": "B4_biaya_bulanan",
+  "sec": "Biaya dan aplikasi",
+  "path": "ev",
+  "type": "single",
+  "text": "Kira-kira berapa biaya mengisi daya Anda dalam sebulan, di semua tempat?",
+  "options": [
+   {
+    "v": "Kurang dari Rp300 ribu"
+   },
+   {
+    "v": "Rp300–600 ribu"
+   },
+   {
+    "v": "Rp600 ribu–1 juta"
+   },
+   {
+    "v": "Rp1–1,5 juta"
+   },
+   {
+    "v": "Rp1,5–2,5 juta"
+   },
+   {
+    "v": "Lebih dari Rp2,5 juta"
+   },
+   {
+    "v": "Tidak tahu",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "B5",
+  "key": "B5_aplikasi",
+  "sec": "Biaya dan aplikasi",
+  "path": "ev",
+  "type": "multi",
+  "shuffle": true,
+  "hint": "Boleh pilih lebih dari satu",
+  "text": "Aplikasi apa yang Anda pakai untuk mengisi daya atau mencari charger?",
+  "options": [
+   {
+    "v": "PLN Mobile",
+    "e": "⚡"
+   },
+   {
+    "v": "Google Maps atau Waze",
+    "e": "🗺️"
+   },
+   {
+    "v": "Aplikasi charger milik operator lain",
+    "e": "📲"
+   },
+   {
+    "v": "Grup WhatsApp atau komunitas",
+    "e": "💬"
+   },
+   {
+    "v": "Tidak pakai aplikasi",
+    "e": "🙅",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "E1",
+  "key": "E1_perasaan",
+  "sec": "Pengalaman dan harapan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Saat harus mengisi daya di luar rumah, perasaan apa yang paling sering Anda rasakan?",
+  "options": [
+   {
+    "v": "Tenang, tidak ada masalah",
+    "e": "😌"
+   },
+   {
+    "v": "Biasa saja",
+    "e": "😐"
+   },
+   {
+    "v": "Sedikit cemas",
+    "e": "😕"
+   },
+   {
+    "v": "Cemas sekali",
+    "e": "😰"
+   },
+   {
+    "v": "Kesal",
+    "e": "😤"
+   },
+   {
+    "v": "Lelah",
+    "e": "🥱"
+   },
+   {
+    "v": "Bosan",
+    "e": "😑"
+   },
+   {
+    "v": "Biasanya saya tidak perlu mengisi daya di luar rumah",
+    "e": "🏠",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "E2",
+  "key": "E2",
+  "sec": "Pengalaman dan harapan",
+  "path": "ev",
+  "type": "grid",
+  "shuffleRows": true,
+  "likert": {
+   "min": "Sangat tidak setuju",
+   "max": "Sangat setuju"
+  },
+  "hint": "Pilih angka 1–4 untuk tiap pernyataan. 1 = Sangat tidak setuju, 2 = Tidak setuju, 3 = Setuju, 4 = Sangat setuju",
+  "text": "Seberapa setuju Anda dengan pernyataan berikut?",
+  "rows": [
+   {
+    "k": "biaya_wajar",
+    "v": "Biaya mengisi daya di tempat umum masuk akal"
+   },
+   {
+    "k": "cari_charger_lama",
+    "v": "Mencari charger yang kosong sering menyita waktu"
+   },
+   {
+    "k": "tenang_jauh",
+    "v": "Saya merasa tenang bepergian jauh dengan kendaraan listrik"
+   },
+   {
+    "k": "suka_aktivitas",
+    "v": "Saya lebih suka mengisi daya di tempat yang ada hal lain untuk dilakukan"
+   },
+   {
+    "k": "promo_pengaruh",
+    "v": "Promo atau diskon memengaruhi pilihan tempat saya mengisi daya"
+   },
+   {
+    "k": "banyak_aplikasi",
+    "v": "Memakai banyak aplikasi untuk mengisi daya itu merepotkan"
+   }
+  ],
+  "cols": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ]
+ },
+ {
+  "id": "E3",
+  "key": "E3_diceritakan",
+  "sec": "Pengalaman dan harapan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Apa yang paling sering Anda ceritakan ke teman atau keluarga tentang kendaraan listrik?",
+  "options": [
+   {
+    "v": "Hemat biaya bahan bakar",
+    "e": "💰"
+   },
+   {
+    "v": "Nyaman dan tenang dikendarai",
+    "e": "😌"
+   },
+   {
+    "v": "Ramah lingkungan",
+    "e": "🌱"
+   },
+   {
+    "v": "Repot mencari charger",
+    "e": "🔎"
+   },
+   {
+    "v": "Repot antre atau menunggu",
+    "e": "⏳"
+   },
+   {
+    "v": "Biaya perawatan atau baterai",
+    "e": "🔋"
+   },
+   {
+    "v": "Saya tidak pernah bercerita soal ini",
+    "e": "🤐",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "E4",
+  "key": "E4_harapan",
+  "sec": "Pengalaman dan harapan",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Dari daftar ini, apa yang paling Anda harapkan dari layanan pengisian daya?",
+  "options": [
+   {
+    "v": "Charger selalu tersedia",
+    "e": "✅"
+   },
+   {
+    "v": "Biaya mengisi daya lebih hemat",
+    "e": "💸"
+   },
+   {
+    "v": "Pembayaran mudah dan cepat",
+    "e": "📲"
+   },
+   {
+    "v": "Ada hal menyenangkan saat menunggu",
+    "e": "🎟️"
+   },
+   {
+    "v": "Pengisian lebih cepat",
+    "e": "⚡"
+   },
+   {
+    "v": "Lokasi charger lebih banyak",
+    "e": "📍"
+   },
+   {
+    "v": "Informasi ketersediaan charger secara langsung",
+    "e": "📡"
+   },
+   {
+    "v": "Tempat pengisian yang aman",
+    "e": "🛡️"
+   },
+   {
+    "v": "Tidak ada harapan khusus",
+    "e": "🤷",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K0",
+  "key": "",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "concept",
+  "text": "Gambaran layanan langganan yang sedang dirancang",
+  "konsep": {
+   "judul": "Gambaran layanan langganan yang sedang dirancang",
+   "isi": "Layanan ini masih dalam tahap rancangan, jadi isinya hanya contoh. Anda membayar biaya bulanan tetap lewat aplikasi PLN Mobile, lalu mendapat paket manfaat. Bacalah sebentar, lalu jawab pertanyaan berikutnya.",
+   "fitur": [
+    {
+     "e": "🎟️",
+     "t": "Voucher tenant",
+     "d": "Voucher dari kafe, restoran, dan toko di sekitar lokasi charger. Nilai satu voucher sekitar Rp25.000. Tersedia di kota tertentu."
+    },
+    {
+     "e": "⚡",
+     "t": "Potongan biaya ngecas",
+     "d": "Potongan dari biaya layanan pengisian daya di charger PLN."
+    },
+    {
+     "e": "⭐",
+     "t": "Poin tiap ngecas",
+     "d": "Setiap pengisian daya menghasilkan poin yang bisa ditukar."
+    },
+    {
+     "e": "🛠️",
+     "t": "Diskon perawatan",
+     "d": "Potongan harga di bengkel atau tempat cuci kendaraan mitra."
+    }
+   ],
+   "catatan": "Isi dan harga paket di pertanyaan berikutnya hanya contoh untuk meminta pendapat Anda, belum final."
+  }
+ },
+ {
+  "id": "K1",
+  "key": "K1_minat",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "single",
+  "text": "Seberapa tertarik Anda dengan layanan langganan seperti ini?",
+  "options": [
+   {
+    "v": "Sangat tertarik",
+    "e": "🤩"
+   },
+   {
+    "v": "Tertarik",
+    "e": "🙂"
+   },
+   {
+    "v": "Kurang tertarik",
+    "e": "😕"
+   },
+   {
+    "v": "Tidak tertarik",
+    "e": "🙅"
+   }
+  ]
+ },
+ {
+  "id": "K2",
+  "key": "K2",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "grid",
+  "shuffleRows": true,
+  "likert": {
+   "min": "Tidak menarik",
+   "max": "Sangat menarik"
+  },
+  "hint": "Pilih angka 1–4 untuk tiap manfaat. 1 = Tidak menarik, 2 = Kurang menarik, 3 = Cukup menarik, 4 = Sangat menarik",
+  "text": "Seberapa menarik tiap manfaat berikut bagi Anda?",
+  "rows": [
+   {
+    "k": "voucher_kopi",
+    "v": "Voucher kopi atau minuman dari tenant dekat charger"
+   },
+   {
+    "k": "voucher_makan",
+    "v": "Voucher makanan dari tenant dekat charger"
+   },
+   {
+    "k": "voucher_belanja",
+    "v": "Voucher belanja minimarket atau toko"
+   },
+   {
+    "k": "potongan_layanan",
+    "v": "Potongan biaya layanan pengisian daya"
+   },
+   {
+    "k": "poin",
+    "v": "Poin tiap mengisi daya yang bisa ditukar"
+   },
+   {
+    "k": "diskon_bengkel",
+    "v": "Diskon bengkel atau cuci kendaraan"
+   }
+  ],
+  "cols": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ]
+ },
+ {
+  "id": "K3",
+  "key": "K3_manfaat_terpenting",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Kalau hanya boleh memilih satu, manfaat mana yang paling penting bagi Anda?",
+  "options": [
+   {
+    "v": "Voucher kopi atau minuman",
+    "e": "☕"
+   },
+   {
+    "v": "Voucher makanan",
+    "e": "🍜"
+   },
+   {
+    "v": "Voucher belanja minimarket atau toko",
+    "e": "🏪"
+   },
+   {
+    "v": "Potongan biaya layanan pengisian daya",
+    "e": "⚡"
+   },
+   {
+    "v": "Poin yang bisa ditukar",
+    "e": "⭐"
+   },
+   {
+    "v": "Diskon bengkel atau cuci kendaraan",
+    "e": "🛠️"
+   },
+   {
+    "v": "Tidak ada yang menarik",
+    "e": "🙅",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "K4",
+  "key": "K4_jenis_voucher",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Voucher dari jenis tenant apa yang paling akan Anda pakai?",
+  "options": [
+   {
+    "v": "Kopi atau minuman",
+    "e": "☕"
+   },
+   {
+    "v": "Makanan berat",
+    "e": "🍛"
+   },
+   {
+    "v": "Camilan atau roti",
+    "e": "🥐"
+   },
+   {
+    "v": "Minimarket",
+    "e": "🏪"
+   },
+   {
+    "v": "Belanja ritel (pakaian, elektronik, dan sejenisnya)",
+    "e": "🛍️"
+   },
+   {
+    "v": "Cuci atau perawatan kendaraan",
+    "e": "🚿"
+   },
+   {
+    "v": "Bioskop atau hiburan",
+    "e": "🎬"
+   },
+   {
+    "v": "Apotek atau kesehatan",
+    "e": "💊"
+   },
+   {
+    "v": "Tidak ada yang saya butuhkan",
+    "e": "🙅",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K5",
+  "key": "K5_pilihan_paket",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "cards",
+  "shuffle": true,
+  "hint": "Urutan paket diacak. Pilih yang paling sesuai untuk Anda.",
+  "rinci": "Isi paket: Paket Ringan berisi 5 voucher tenant dan poin tiap ngecas; Paket Seimbang berisi 10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas; Paket Lengkap berisi 15 voucher tenant, potongan biaya layanan lebih besar, poin ganda, dan diskon bengkel serta cuci kendaraan.",
+  "text": "Dari contoh paket ini, mana yang paling Anda pilih?",
+  "options": [
+   {
+    "v": "Paket Ringan (Rp99.000 per bulan)",
+    "e": "🌱",
+    "t": "Paket Ringan",
+    "l": [
+     "Rp99.000 per bulan",
+     "5 voucher tenant",
+     "Poin tiap ngecas"
+    ],
+    "rinci": "5 voucher tenant dan poin tiap ngecas"
+   },
+   {
+    "v": "Paket Seimbang (Rp199.000 per bulan)",
+    "e": "⚖️",
+    "t": "Paket Seimbang",
+    "l": [
+     "Rp199.000 per bulan",
+     "10 voucher tenant",
+     "Potongan biaya layanan ngecas",
+     "Poin tiap ngecas"
+    ],
+    "rinci": "10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas"
+   },
+   {
+    "v": "Paket Lengkap (Rp299.000 per bulan)",
+    "e": "🎁",
+    "t": "Paket Lengkap",
+    "l": [
+     "Rp299.000 per bulan",
+     "15 voucher tenant",
+     "Potongan biaya layanan lebih besar",
+     "Poin ganda",
+     "Diskon bengkel dan cuci kendaraan"
+    ],
+    "rinci": "15 voucher tenant, potongan biaya layanan lebih besar, poin ganda, dan diskon bengkel serta cuci kendaraan"
+   },
+   {
+    "v": "Tidak ada yang cocok untuk saya",
+    "e": "🙅",
+    "t": "Tidak ada yang cocok untuk saya",
+    "l": [],
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "K6",
+  "key": "K6",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "grid",
+  "hint": "Pilih satu jawaban untuk tiap harga",
+  "text": "Misalnya Paket Seimbang berisi 10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas. Apakah Anda akan berlangganan kalau harganya...",
+  "rows": [
+   {
+    "k": "99rb",
+    "v": "Rp99.000 per bulan"
+   },
+   {
+    "k": "149rb",
+    "v": "Rp149.000 per bulan"
+   },
+   {
+    "k": "199rb",
+    "v": "Rp199.000 per bulan"
+   },
+   {
+    "k": "249rb",
+    "v": "Rp249.000 per bulan"
+   },
+   {
+    "k": "299rb",
+    "v": "Rp299.000 per bulan"
+   }
+  ],
+  "cols": [
+   "Pasti berlangganan",
+   "Kemungkinan besar berlangganan",
+   "Kemungkinan kecil berlangganan",
+   "Tidak berlangganan"
+  ]
+ },
+ {
+  "id": "K7",
+  "key": "K7_cara_bayar",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "single",
+  "text": "Cara membayar langganan mana yang paling cocok untuk Anda?",
+  "options": [
+   {
+    "v": "Dipotong otomatis tiap bulan dari dompet digital atau kartu",
+    "e": "🔄"
+   },
+   {
+    "v": "Bayar manual tiap bulan lewat PLN Mobile",
+    "e": "🗓️"
+   },
+   {
+    "v": "Bayar sekali untuk 3 bulan dengan potongan harga",
+    "e": "📆"
+   },
+   {
+    "v": "Bayar sekali untuk 12 bulan dengan potongan lebih besar",
+    "e": "🎯"
+   },
+   {
+    "v": "Saya tidak yakin",
+    "e": "🤷",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "K8",
+  "key": "K8_keraguan",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Hal apa yang paling membuat Anda ragu berlangganan?",
+  "options": [
+   {
+    "v": "Tenant partner tidak ada di rute saya",
+    "e": "📍"
+   },
+   {
+    "v": "Voucher sulit dipakai atau klaimnya ribet",
+    "e": "🧩"
+   },
+   {
+    "v": "Harga langganan memberatkan",
+    "e": "💸"
+   },
+   {
+    "v": "Saya jarang mengisi daya di charger umum",
+    "e": "🏠"
+   },
+   {
+    "v": "Takut voucher tidak terpakai atau hangus",
+    "e": "⌛"
+   },
+   {
+    "v": "Lebih suka bayar per pengisian tanpa langganan",
+    "e": "🧾"
+   },
+   {
+    "v": "Belum percaya manfaatnya sepadan",
+    "e": "🤔"
+   },
+   {
+    "v": "Tidak ada keraguan",
+    "e": "👌",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K9",
+  "key": "K9_perubahan_kebiasaan",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Kalau Anda berlangganan, perubahan apa yang mungkin Anda lakukan?",
+  "options": [
+   {
+    "v": "Mengisi daya di charger umum lebih sering",
+    "e": "⚡"
+   },
+   {
+    "v": "Memilih lokasi charger yang ada tenant partner",
+    "e": "📍"
+   },
+   {
+    "v": "Menambah waktu di lokasi charger",
+    "e": "⏱️"
+   },
+   {
+    "v": "Mencoba tenant baru di sekitar charger",
+    "e": "🆕"
+   },
+   {
+    "v": "Mengurangi pengisian daya di rumah",
+    "e": "🏠"
+   },
+   {
+    "v": "Tidak ada perubahan",
+    "e": "🙅",
+    "fix": true,
+    "x": true
+   },
+   {
+    "v": "Saya tidak tahu",
+    "e": "🤷",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K10",
+  "key": "K10_frekuensi_dengan_langganan",
+  "sec": "Layanan langganan",
+  "path": "ev",
+  "type": "single",
+  "text": "Kalau Anda berlangganan, berapa kali seminggu Anda memperkirakan mengisi daya di charger umum?",
+  "options": [
+   {
+    "v": "Tidak pernah"
+   },
+   {
+    "v": "Kurang dari 1 kali seminggu"
+   },
+   {
+    "v": "1 sampai 2 kali"
+   },
+   {
+    "v": "3 sampai 4 kali"
+   },
+   {
+    "v": "5 kali atau lebih"
+   }
+  ]
+ },
+ {
+  "id": "Z1",
+  "key": "Z1_lokasi_charger",
+  "sec": "Penutup",
+  "path": "ev",
+  "type": "text",
+  "required": false,
+  "hint": "Boleh dilewati",
+  "text": "Nama atau lokasi charger umum yang paling sering Anda pakai (misalnya nama SPKLU, mal, atau jalan)"
+ },
+ {
+  "id": "Z2",
+  "key": "Z2_tenant_favorit",
+  "sec": "Penutup",
+  "path": "ev",
+  "type": "text",
+  "required": false,
+  "hint": "Boleh dilewati",
+  "text": "Nama tenant (kafe, restoran, toko) yang paling sering Anda kunjungi dekat charger"
+ },
+ {
+  "id": "Z3",
+  "key": "Z3_masukan",
+  "sec": "Penutup",
+  "path": "ev",
+  "type": "text",
+  "required": false,
+  "hint": "Boleh dilewati",
+  "text": "Ada masukan lain tentang layanan langganan ini?"
+ }
+];
+
+const params = new URLSearchParams(location.search);
+const KANAL = (params.get('kanal') || 'langsung').replace(/[^\w-]/g, '').slice(0, 40) || 'langsung';
+const ADMIN = params.has('admin');
+const KEY_ANTREAN = 'survei-ev-antrean';
+
+const st = { screen: 'welcome', idx: 0, ans: {}, start: 0, consent: false, sent: '', order: {} };
+
+/* ---------- penyimpanan lokal (aman bila diblokir) ---------- */
+function bacaAntrean() { try { return JSON.parse(localStorage.getItem(KEY_ANTREAN) || '[]'); } catch (e) { return []; } }
+function simpanAntrean(list) { try { localStorage.setItem(KEY_ANTREAN, JSON.stringify(list)); } catch (e) { /* abaikan */ } }
+
+/* ---------- alur ---------- */
+function jalur() {
+  const a = st.ans.A1;
+  if (!a) return null;
+  return a === 'Saya belum pakai kendaraan listrik' ? 'none' : 'ev';
+}
+function kondisiOk(q, optimis) {
+  if (!q.when) return true;
+  const a = st.ans[q.when.id];
+  if (!a) return !!optimis;
+  return !q.when.ne.includes(a);
+}
+function tampil(q, optimis) {
+  const p = jalur();
+  if (q.path === 'all') return true;
+  if (p === 'none') return false;
+  if (!p && !optimis) return false;
+  return kondisiOk(q, optimis);
+}
+function alur() { return Q.filter(q => tampil(q, false)); }
+function totalLayar() { return jalur() === 'none' ? alur().length : Q.filter(q => tampil(q, true)).length; }
+function terjawab(q) {
+  const a = st.ans[q.id];
+  if (q.type === 'concept' || q.required === false) return true;
+  if (q.type === 'multi') return Array.isArray(a) && a.length > 0;
+  if (q.type === 'grid') return !!a && q.rows.every(r => a[r.k]);
+  return !!a;
+}
+function acak(arr) {
+  const o = arr.slice();
+  for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; }
+  return o;
+}
+/* Opsi bertanda fix tetap di akhir; sisanya diacak sekali per responden. */
+function urutan(q) {
+  if (!q.shuffle) return q.options;
+  if (!st.order[q.id]) st.order[q.id] = acak(q.options.filter(o => !o.fix)).concat(q.options.filter(o => o.fix));
+  return st.order[q.id];
+}
+function urutanBaris(q) {
+  if (!q.shuffleRows) return q.rows;
+  const k = q.id + '_r';
+  if (!st.order[k]) st.order[k] = acak(q.rows);
+  return st.order[k];
+}
+
+/* ---------- pembantu DOM ---------- */
+function el(tag, attrs, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') n.className = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, '');
+    else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(c));
+  return n;
+}
+
+function maskot(senang) {
+  const s = '<svg class="mascot" viewBox="0 0 160 160" aria-hidden="true">' +
+    '<path d="M80 128c0 18 18 22 34 18" fill="none" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>' +
+    '<rect x="56" y="14" width="12" height="30" rx="5" fill="var(--ink)"/><rect x="92" y="14" width="12" height="30" rx="5" fill="var(--ink)"/>' +
+    '<rect x="30" y="36" width="100" height="94" rx="30" fill="var(--volt)" stroke="var(--ink)" stroke-width="5"/>' +
+    '<rect x="44" y="50" width="72" height="12" rx="6" fill="#FFFFFF" opacity=".25"/>' +
+    (senang
+      ? '<path d="M56 82q8-9 16 0M88 82q8-9 16 0" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M60 96q20 22 40 0z" fill="#FFFFFF"/>'
+      : '<ellipse cx="64" cy="82" rx="6" ry="8" fill="#FFFFFF"/><ellipse cx="96" cy="82" rx="6" ry="8" fill="#FFFFFF"/>' +
+        '<path d="M64 100q16 12 32 0" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>') +
+    '<circle cx="50" cy="98" r="7" fill="#FF8FA3" opacity=".8"/><circle cx="110" cy="98" r="7" fill="#FF8FA3" opacity=".8"/>' +
+    (senang ? '<path d="M138 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="var(--spark)" stroke="var(--ink)" stroke-width="2"/>' : '') +
+    '</svg>';
+  const w = document.createElement('div');
+  w.innerHTML = s;
+  return w.firstChild;
+}
+
+function ilustrasiLangganan() {
+  const s = '<svg class="konsep-ilus" viewBox="0 0 340 170" aria-hidden="true">' +
+    '<rect x="0" y="158" width="340" height="6" rx="3" fill="var(--line)"/>' +
+    '<rect x="122" y="6" width="96" height="152" rx="18" fill="var(--surface)" stroke="var(--ink)" stroke-width="4"/>' +
+    '<rect x="150" y="14" width="40" height="6" rx="3" fill="var(--ink)"/>' +
+    '<rect x="134" y="30" width="72" height="38" rx="10" fill="var(--volt)"/>' +
+    '<path d="M172 36l-9 13h7l-4 11 11-14h-7z" fill="var(--spark)"/>' +
+    '<rect x="134" y="78" width="72" height="14" rx="7" fill="var(--line)"/><rect x="134" y="98" width="52" height="14" rx="7" fill="var(--line)"/>' +
+    '<rect x="134" y="122" width="72" height="26" rx="10" fill="var(--spark)"/>' +
+    '<g transform="rotate(-12 64 80)"><path d="M22 54h84a8 8 0 0 1 0 16v8a8 8 0 0 1 0 16v8H22v-8a8 8 0 0 0 0-16v-8a8 8 0 0 0 0-16z" fill="var(--spark)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>' +
+    '<path d="M50 70h28M50 84h20" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></g>' +
+    '<g transform="rotate(10 276 90)"><path d="M234 64h84a8 8 0 0 1 0 16v8a8 8 0 0 1 0 16v8h-84v-8a8 8 0 0 0 0-16v-8a8 8 0 0 0 0-16z" fill="var(--full)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>' +
+    '<path d="M262 82h28M262 96h20" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/></g>' +
+    '</svg>';
+  const w = document.createElement('div');
+  w.innerHTML = s;
+  return w.firstChild;
+}
+
+/* ---------- baterai ---------- */
+function setBaterai(pct) {
+  const fill = document.getElementById('fill');
+  fill.style.width = pct + '%';
+  fill.style.backgroundColor = pct < 34 ? 'var(--low)' : pct < 67 ? 'var(--spark)' : 'var(--full)';
+  document.getElementById('pct').textContent = pct + '%';
+  document.querySelector('.battery').setAttribute('aria-valuenow', String(pct));
+}
+
+/* ---------- layar ---------- */
+function render() {
+  const app = document.getElementById('app');
+  app.replaceChildren();
+  document.getElementById('demo').hidden = !!KONFIG.SCRIPT_URL;
+  if (ADMIN) return layarAdmin(app);
+  if (st.screen === 'welcome') layarPembuka(app);
+  else if (st.screen === 'q') layarPertanyaan(app);
+  else layarAkhir(app);
+}
+
+function layarPembuka(app) {
+  setBaterai(0);
+  const mulai = el('button', { class: 'next', disabled: !st.consent, onclick: () => { st.screen = 'q'; st.idx = 0; st.start = Date.now(); render(); } }, 'Mulai isi');
+  app.append(el('section', { class: 'hero' },
+    maskot(false),
+    el('h1', {}, 'Survei Perilaku dan Kebutuhan Pengguna Kendaraan Listrik'),
+    el('p', {}, 'Halo, Bapak dan Ibu! Kami sedang melakukan riset tentang kendaraan listrik, khususnya kebiasaan dan kebutuhan pengguna saat mengisi daya.'),
+    el('ul', { class: 'facts' }, el('li', {}, '⏱️ Sekitar 7 menit'), el('li', {}, '👆 Sebagian besar tinggal pilih'), el('li', {}, '🙈 Tanpa nama')),
+    el('label', { class: 'consent' },
+      el('input', { type: 'checkbox', checked: st.consent, onchange: e => { st.consent = e.target.checked; mulai.disabled = !st.consent; } }),
+      el('span', {}, 'Saya bersedia mengisi, dan jawaban saya boleh dipakai untuk riset.')),
+    el('p', { class: 'small' }, 'Tidak ada jawaban benar atau salah.')
+  ));
+  navigasi([mulai]);
+}
+
+function layarPertanyaan(app) {
+  const list = alur();
+  const q = list[st.idx];
+  const total = Math.max(totalLayar(), 1);
+  setBaterai(Math.min(100, Math.round(st.idx / total * 100)));
+
+  const judul = el('h1', { class: 'q-title', tabindex: '-1' }, q.text);
+  const box = el('section', {}, el('p', { class: 'sec' }, q.sec), judul, q.hint ? el('p', { class: 'hint' }, q.hint) : null);
+  const next = el('button', { class: 'next', onclick: maju });
+  const segarkanNext = () => {
+    next.disabled = !terjawab(q);
+    const kosong = q.required === false && !st.ans[q.id];
+    next.textContent = st.idx === list.length - 1 ? 'Kirim jawaban' : kosong ? 'Lewati' : 'Lanjut';
+  };
+
+  if (q.type === 'concept') {
+    box.replaceChildren(el('p', { class: 'sec' }, q.sec), judul);
+    box.append(ilustrasiLangganan(), el('p', { class: 'konsep-isi' }, q.konsep.isi),
+      el('ul', { class: 'feats' }, q.konsep.fitur.map(f => el('li', { class: 'feat' },
+        el('span', { class: 'emo', 'aria-hidden': 'true' }, f.e),
+        el('span', {}, el('span', { class: 'feat-t' }, f.t), el('span', { class: 'feat-d' }, f.d))))),
+      q.konsep.catatan ? el('p', { class: 'small' }, q.konsep.catatan) : null);
+  }
+
+  if (q.type === 'single' || q.type === 'cards') {
+    const opts = el('div', { class: 'opts', role: 'group', 'aria-label': q.text });
+    urutan(q).forEach(o => {
+      const on = st.ans[q.id] === o.v;
+      const isi = q.type === 'cards'
+        ? [el('span', { class: 'emo' }, o.e || ''), el('span', {}, el('span', { class: 'card-t' }, o.t), ...(o.l || []).map(x => el('span', { class: 'card-l' }, x)))]
+        : [o.e ? el('span', { class: 'emo' }, o.e) : null, el('span', {}, o.v), el('span', { class: 'tick', 'aria-hidden': 'true' }, on ? '✓' : '')];
+      opts.append(el('button', {
+        class: 'opt' + (q.type === 'cards' ? ' card' : ''), 'aria-pressed': on ? 'true' : 'false',
+        onclick: (e) => {
+          st.ans[q.id] = o.v;
+          [...opts.children].forEach(b => {
+            b.setAttribute('aria-pressed', 'false');
+            const t = b.querySelector('.tick'); if (t) t.textContent = '';
+          });
+          const btn = e.currentTarget;
+          btn.setAttribute('aria-pressed', 'true');
+          const t = btn.querySelector('.tick'); if (t) t.textContent = '✓';
+          segarkanNext();
+          const di = st.idx;
+          clearTimeout(st.timer);
+          st.timer = setTimeout(() => { if (st.screen === 'q' && st.idx === di) maju(); }, 280);
+        }
+      }, ...isi));
+    });
+    box.append(opts);
+  }
+
+  if (q.type === 'multi') {
+    const max = q.max || 99;
+    const pilih = st.ans[q.id] || [];
+    const opts = el('div', { class: 'opts multi', role: 'group', 'aria-label': q.text });
+    const hitung = el('p', { class: 'count' });
+    const xs = new Set(q.options.filter(o => o.x).map(o => o.v));
+    const segarkan = () => {
+      const now = st.ans[q.id] || [];
+      const adaX = now.some(v => xs.has(v));
+      [...opts.children].forEach(b => {
+        const on = now.includes(b.dataset.v);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        b.querySelector('.tick').textContent = on ? '✓' : '';
+        b.disabled = !on && !xs.has(b.dataset.v) && !adaX && now.length >= max;
+      });
+      hitung.textContent = q.max ? now.length + ' dari ' + max + ' dipilih' : now.length + ' dipilih';
+      segarkanNext();
+    };
+    urutan(q).forEach(o => {
+      opts.append(el('button', {
+        class: 'opt', 'data-v': o.v, 'aria-pressed': pilih.includes(o.v) ? 'true' : 'false',
+        onclick: () => {
+          let now = (st.ans[q.id] || []).slice();
+          const i = now.indexOf(o.v);
+          if (xs.has(o.v)) now = i >= 0 ? [] : [o.v];
+          else {
+            now = now.filter(v => !xs.has(v));
+            const j = now.indexOf(o.v);
+            if (j >= 0) now.splice(j, 1); else if (now.length < max) now.push(o.v);
+          }
+          st.ans[q.id] = now;
+          segarkan();
+        }
+      }, o.e ? el('span', { class: 'emo' }, o.e) : null, el('span', {}, o.v), el('span', { class: 'tick', 'aria-hidden': 'true' })));
+    });
+    box.append(opts, hitung);
+    setTimeout(segarkan);
+  }
+
+  if (q.type === 'grid') {
+    const wrap = el('div', { class: 'opts' });
+    const a = st.ans[q.id] || (st.ans[q.id] = {});
+    urutanBaris(q).forEach(r => {
+      const row = el('div', { class: 'grow' + (a[r.k] ? ' done' : ''), role: 'group', 'aria-label': r.v });
+      const pills = el('div', { class: 'pills' + (q.likert ? ' likert' : '') });
+      q.cols.forEach(c => {
+        pills.append(el('button', {
+          class: 'pill', 'aria-pressed': a[r.k] === c ? 'true' : 'false',
+          onclick: () => {
+            a[r.k] = c;
+            [...pills.children].forEach(b => b.setAttribute('aria-pressed', b.textContent === c ? 'true' : 'false'));
+            row.classList.add('done');
+            segarkanNext();
+          }
+        }, c));
+      });
+      row.append(el('p', { class: 'glabel' }, r.v), pills, q.likert ? el('div', { class: 'ends', 'aria-hidden': 'true' }, el('span', {}, '1 = ' + q.likert.min), el('span', {}, '4 = ' + q.likert.max)) : null);
+      wrap.append(row);
+    });
+    box.append(wrap);
+  }
+
+  if (q.type === 'text') {
+    box.append(el('textarea', {
+      class: 'field', maxlength: '300', placeholder: 'Tulis singkat saja', 'aria-label': q.text,
+      oninput: e => { st.ans[q.id] = e.target.value.trim(); segarkanNext(); }
+    }, st.ans[q.id] || ''));
+  }
+
+  app.append(box);
+  segarkanNext();
+  const back = el('button', { class: 'back', onclick: mundur }, 'Kembali');
+  navigasi([back, next]);
+  judul.focus({ preventScroll: true });
+  window.scrollTo({ top: 0 });
+}
+
+function maju() {
+  clearTimeout(st.timer);
+  const list = alur();
+  const q = list[st.idx];
+  if (!q || !terjawab(q)) return;
+  if (q.id === 'A1' && jalur() === 'none') { kirim(); st.screen = 'notev'; return render(); }
+  if (st.idx < alur().length - 1) { st.idx++; render(); }
+  else { kirim(); st.screen = 'end'; render(); }
+}
+function mundur() {
+  clearTimeout(st.timer);
+  if (st.idx === 0) { st.screen = 'welcome'; } else { st.idx--; }
+  render();
+}
+
+function navigasi(btns) {
+  const nav = document.getElementById('nav');
+  nav.hidden = !btns.length;
+  document.getElementById('navIn').replaceChildren(...btns);
+}
+
+function layarAkhir(app) {
+  setBaterai(100);
+  navigasi([]);
+  const bukanEv = st.screen === 'notev';
+  const pesan = !KONFIG.SCRIPT_URL ? 'Mode uji: jawaban ini tidak dikirim ke spreadsheet.'
+    : st.sent === 'ok' ? 'Jawaban Anda sudah terkirim.'
+    : st.sent === 'antre' ? 'Sinyal sedang lemah. Jawaban tersimpan di HP ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.'
+    : 'Sedang mengirim jawaban...';
+  app.append(el('section', { class: 'end' },
+    maskot(true),
+    el('h1', {}, bukanEv ? 'Terima kasih sudah mampir!' : 'Terima kasih, Bapak dan Ibu!'),
+    el('p', {}, bukanEv ? 'Survei ini khusus pengguna kendaraan listrik.' : 'Jawaban Anda membantu kami merancang tempat pengisian daya yang lebih sesuai dengan kebutuhan driver.'),
+    el('p', { class: 'small', id: 'statusKirim' }, pesan)
+  ));
+  if (!bukanEv) konfeti();
+}
+
+function konfeti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = el('div', { class: 'confetti', 'aria-hidden': 'true' });
+  const warna = ['var(--volt)', 'var(--spark)', 'var(--full)', 'var(--low)'];
+  for (let i = 0; i < 46; i++) {
+    const p = el('i');
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = warna[i % warna.length];
+    p.style.animationDelay = Math.random() * .5 + 's';
+    p.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    box.append(p);
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 2800);
+}
+
+/* ---------- pengiriman ---------- */
+function idAcak() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function payload() {
+  const j = jalur();
+  const p = {
+    id_respons: idAcak(), kanal: KANAL,
+    jalur: j === 'ev' ? ({ 'Mobil listrik': 'mobil', 'Motor listrik': 'motor', 'Mobil dan motor listrik': 'mobil_motor' }[st.ans.A1] || 'ev') : 'bukan_ev',
+    durasi_detik: Math.round((Date.now() - st.start) / 1000), persetujuan: 'Ya'
+  };
+  alur().forEach(q => {
+    if (q.type === 'concept') return;
+    const a = st.ans[q.id];
+    if (q.type === 'grid') q.rows.forEach(r => { p[q.key + '_' + r.k] = (a && a[r.k]) || ''; });
+    else if (q.type === 'multi') p[q.key] = (a || []).join('; ');
+    else p[q.key] = a || '';
+  });
+  return p;
+}
+function kirimSatu(data) {
+  return fetch(KONFIG.SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  });
+}
+async function kirim() {
+  if (!KONFIG.SCRIPT_URL) return;
+  const data = payload();
+  simpanAntrean(bacaAntrean().concat([data]));
+  st.sent = '';
+  await kirimAntrean();
+  const status = document.getElementById('statusKirim');
+  if (status) status.textContent = st.sent === 'ok' ? 'Jawaban Anda sudah terkirim.'
+    : 'Sinyal sedang lemah. Jawaban tersimpan di HP ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.';
+}
+async function kirimAntrean() {
+  let list = bacaAntrean();
+  for (const item of list.slice()) {
+    try {
+      await kirimSatu(item);
+      list = list.filter(x => x.id_respons !== item.id_respons);
+      simpanAntrean(list);
+      st.sent = 'ok';
+    } catch (e) {
+      st.sent = 'antre';
+      return;
+    }
+  }
+}
+
+/* ---------- panel admin: unduh Excel ---------- */
+function layarAdmin(app) {
+  setBaterai(100);
+  navigasi([]);
+  const kunci = el('input', { class: 'field', type: 'password', placeholder: 'Kunci admin', autocomplete: 'off' });
+  const status = el('p', { class: 'status', role: 'status' });
+  const tombol = el('button', { class: 'btn', onclick: () => unduhExcel(kunci.value, status) }, 'Unduh Excel respons');
+  app.append(el('section', { class: 'admin' },
+    el('h1', {}, 'Rekap respons'),
+    el('p', { class: 'hint' }, 'Mengambil semua jawaban dari website dan Google Form, lalu menyimpannya sebagai satu file Excel dengan dua sheet.'),
+    el('label', {}, 'Kunci admin', kunci), tombol, status));
+}
+function muatSheetJS() {
+  if (window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = res; s.onerror = () => rej(new Error('SheetJS gagal dimuat'));
+    document.head.append(s);
+  });
+}
+async function unduhExcel(kunci, status) {
+  if (!KONFIG.SCRIPT_URL) { status.textContent = 'URL Apps Script belum diisi di KONFIG.'; return; }
+  status.textContent = 'Mengambil data...';
+  try {
+    const [res] = await Promise.all([fetch(KONFIG.SCRIPT_URL + '?key=' + encodeURIComponent(kunci)), muatSheetJS()]);
+    const data = await res.json();
+    if (!data.ok) { status.textContent = data.error || 'Kunci salah.'; return; }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data.website.length ? data.website : [['Belum ada data']]), 'Website');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data.form.length ? data.form : [['Belum ada data']]), 'Google Form');
+    const tgl = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, 'respons-survei-driver-ev-' + tgl + '.xlsx');
+    status.textContent = 'Selesai: ' + Math.max(data.website.length - 1, 0) + ' jawaban website dan ' + Math.max(data.form.length - 1, 0) + ' jawaban Google Form.';
+  } catch (e) {
+    status.textContent = 'Gagal mengambil data. Cek URL Apps Script, atau unduh langsung dari Google Sheet (File, Download, Microsoft Excel).';
+  }
+}
+
+render();
+if (KONFIG.SCRIPT_URL && !ADMIN) kirimAntrean();
+</script>
+</body>
+</html>
