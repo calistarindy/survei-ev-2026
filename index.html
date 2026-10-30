@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Survei Perilaku dan Kebutuhan Pengguna Kendaraan Listrik</title>
-<meta name="description" content="Survei perilaku dan kebutuhan pengguna kendaraan listrik. Sekitar 7 menit, sebagian besar tinggal pilih jawaban.">
+<title>Survei Driver Kendaraan Listrik dan Layanan Charger Umum (SPKLU)</title>
+<meta name="description" content="Survei untuk driver transportasi online pengguna kendaraan listrik di Jabodetabek. Sekitar 10–12 menit, sebagian besar tinggal pilih jawaban.">
 <meta name="theme-color" content="#2340FF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,6 +61,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Layar pembuka */
 .hero{text-align:center;padding-top:8px}
 .mascot{width:150px;height:150px;display:block;margin:6px auto 0}
+.hero h1.judul-panjang{font-size:23px;line-height:1.12}
 .hero h1{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;font-size:31px;line-height:1.05;margin:8px 0 12px;letter-spacing:-.01em}
 .hero p{margin:0 auto 10px;max-width:34ch;color:var(--muted)}
 .facts{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
@@ -97,6 +98,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pill{padding:9px 14px;min-height:44px;border:2px solid var(--line);border-radius:999px;background:var(--bg);font-size:15px;font-weight:600}
 .pills.likert{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .pills.likert .pill{padding:6px 0;min-height:52px;text-align:center;font-family:"Baloo 2",system-ui,sans-serif;font-size:24px;font-weight:700;border-radius:14px}
+.pill.na{width:100%;margin-top:10px;font-size:14px;min-height:42px}
+.pill.na[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .ends{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-size:13px;color:var(--muted);font-weight:600}
 .pill[aria-pressed="true"]{background:var(--volt);border-color:var(--volt);color:var(--volt-ink)}
 .field{width:100%;margin-top:18px;padding:14px 16px;font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:16px}
@@ -138,7 +141,7 @@ textarea.field{min-height:120px;resize:vertical}
 .btn{margin-top:16px;width:100%;min-height:56px;border:none;border-radius:18px;background:var(--volt);color:var(--volt-ink);font-weight:700;font-size:18px;box-shadow:0 4px 0 var(--volt-deep)}
 .status{margin-top:14px;font-weight:600}
 
-@media (min-width:600px){.q-title{font-size:31px}.hero h1{font-size:40px}}
+@media (min-width:600px){.q-title{font-size:31px}.hero h1{font-size:40px}.hero h1.judul-panjang{font-size:30px}}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -160,364 +163,1229 @@ textarea.field{min-height:120px;resize:vertical}
 /* ===== Pengaturan: ubah dua baris ini sebelum disebar ===== */
 const KONFIG = {
   // Tempel URL Web App dari Apps Script (berakhiran /exec). Kosong = mode uji.
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyR_T5dhA_rV8YycTGdp_fC_1yeWO3dtWaPwbZtvkw0a0EhkxSo8oOiEqV5m01wz70k/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzYlZE68yzLILaYag64F_ZOakq_FT-2_Nk3uH3BD4jUZR37Miv_5c9w6SKvORC6v8PE/exec'
 };
 /* ========================================================= */
 
 const Q = [
  {
-  "id": "A1",
-  "key": "A1_kendaraan",
-  "sec": "Profil singkat",
+  "id": "P0",
+  "key": "P0_persetujuan",
+  "sec": "Persetujuan",
   "path": "all",
   "type": "single",
-  "hint": "Bila punya keduanya, jawablah untuk kendaraan yang paling sering Anda pakai",
-  "text": "Kendaraan listrik apa yang Anda pakai?",
+  "text": "Apakah Anda bersedia berpartisipasi dalam survei ini?",
   "options": [
    {
-    "v": "Mobil listrik",
-    "e": "🚗"
+    "v": "Ya, bersedia"
    },
    {
-    "v": "Motor listrik",
-    "e": "🛵"
+    "v": "Tidak bersedia",
+    "end": true
+   }
+  ]
+ },
+ {
+  "id": "A1",
+  "key": "A1_status_driver",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Apakah saat ini Anda aktif sebagai driver transportasi online?",
+  "options": [
+   {
+    "v": "Ya, aktif"
    },
    {
-    "v": "Mobil dan motor listrik",
-    "e": "🚗"
+    "v": "Tidak aktif saat ini, tetapi pernah menjadi driver",
+    "end": true
    },
    {
-    "v": "Saya belum pakai kendaraan listrik",
-    "e": "⛽",
-    "fix": true
+    "v": "Tidak pernah menjadi driver",
+    "end": true
    }
   ]
  },
  {
   "id": "A2",
-  "key": "A2_tujuan",
-  "sec": "Profil singkat",
+  "key": "A2_wilayah",
+  "sec": "Penyaringan dan profil responden",
   "path": "ev",
   "type": "single",
-  "text": "Untuk apa Anda terutama memakai kendaraan listrik?",
+  "text": "Di wilayah mana Anda paling sering bekerja sebagai driver?",
   "options": [
    {
-    "v": "Pribadi atau keluarga"
+    "v": "Jakarta"
    },
    {
-    "v": "Bekerja sebagai driver online"
+    "v": "Bogor"
    },
    {
-    "v": "Usaha atau operasional kantor"
+    "v": "Depok"
    },
    {
-    "v": "Campuran pribadi dan kerja online"
+    "v": "Tangerang"
+   },
+   {
+    "v": "Tangerang Selatan"
+   },
+   {
+    "v": "Bekasi"
+   },
+   {
+    "v": "Di luar Jabodetabek",
+    "end": true
    }
   ]
  },
  {
   "id": "A3",
   "key": "A3_usia",
-  "sec": "Profil singkat",
+  "sec": "Penyaringan dan profil responden",
   "path": "ev",
   "type": "single",
   "text": "Berapa usia Anda?",
   "options": [
    {
-    "v": "Di bawah 25 tahun"
+    "v": "Di bawah 17 tahun",
+    "end": true
    },
    {
-    "v": "25 sampai 34 tahun"
+    "v": "17–24 tahun"
    },
    {
-    "v": "35 sampai 44 tahun"
+    "v": "25–34 tahun"
    },
    {
-    "v": "45 sampai 54 tahun"
+    "v": "35–44 tahun"
+   },
+   {
+    "v": "45–54 tahun"
    },
    {
     "v": "55 tahun atau lebih"
-   },
-   {
-    "v": "Tidak ingin menjawab"
    }
   ]
  },
  {
   "id": "A4",
-  "key": "A4_wilayah",
-  "sec": "Profil singkat",
+  "key": "A4_kendaraan",
+  "sec": "Penyaringan dan profil responden",
   "path": "ev",
   "type": "single",
-  "text": "Di wilayah mana Anda paling sering memakai kendaraan?",
+  "text": "Jenis kendaraan listrik apa yang paling sering Anda gunakan untuk bekerja sebagai driver?",
   "options": [
    {
-    "v": "Jakarta"
+    "v": "Mobil listrik"
    },
    {
-    "v": "Bogor atau Depok"
+    "v": "Motor listrik"
+   }
+  ]
+ },
+ {
+  "id": "A5",
+  "key": "A5_frekuensi_kerja",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam 30 hari terakhir, seberapa sering Anda menggunakan kendaraan listrik tersebut untuk bekerja?",
+  "options": [
+   {
+    "v": "Setiap hari atau hampir setiap hari"
    },
    {
-    "v": "Tangerang atau Tangsel"
+    "v": "4–5 hari per minggu"
    },
    {
-    "v": "Bekasi"
+    "v": "2–3 hari per minggu"
    },
    {
-    "v": "Bandung"
+    "v": "1 hari per minggu atau kurang"
    },
    {
-    "v": "Semarang atau Yogyakarta"
+    "v": "Tidak digunakan untuk bekerja dalam 30 hari terakhir",
+    "end": true
+   }
+  ]
+ },
+ {
+  "id": "A6",
+  "key": "A6_platform",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "multi",
+  "hint": "Boleh pilih lebih dari satu",
+  "text": "Platform transportasi online apa yang Anda gunakan saat ini?",
+  "options": [
+   {
+    "v": "Grab"
    },
    {
-    "v": "Surabaya"
+    "v": "Gojek"
    },
    {
-    "v": "Kota lain"
+    "v": "Keduanya"
+   },
+   {
+    "v": "Platform lain (sebutkan)",
+    "other": true
+   }
+  ]
+ },
+ {
+  "id": "A7",
+  "key": "A7_layanan",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Layanan apa yang paling sering Anda jalankan?",
+  "options": [
+   {
+    "v": "Antar-jemput penumpang"
+   },
+   {
+    "v": "Pesan-antar makanan/barang"
+   },
+   {
+    "v": "Keduanya relatif seimbang"
+   },
+   {
+    "v": "Layanan lain",
+    "other": true
+   }
+  ]
+ },
+ {
+  "id": "A8",
+  "key": "A8_hari_aktif",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam seminggu, rata-rata berapa hari Anda aktif menerima pesanan?",
+  "options": [
+   {
+    "v": "1 hari atau kurang"
+   },
+   {
+    "v": "2–3 hari"
+   },
+   {
+    "v": "4–5 hari"
+   },
+   {
+    "v": "6–7 hari"
+   }
+  ]
+ },
+ {
+  "id": "A9",
+  "key": "A9_jam_kerja",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam sehari aktif, rata-rata berapa jam Anda bekerja?",
+  "options": [
+   {
+    "v": "Kurang dari 4 jam"
+   },
+   {
+    "v": "4–6 jam"
+   },
+   {
+    "v": "7–9 jam"
+   },
+   {
+    "v": "10–12 jam"
+   },
+   {
+    "v": "Lebih dari 12 jam"
+   }
+  ]
+ },
+ {
+  "id": "A10",
+  "key": "A10_lama_pakai",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Sudah berapa lama Anda menggunakan kendaraan listrik untuk bekerja?",
+  "options": [
+   {
+    "v": "Kurang dari 3 bulan"
+   },
+   {
+    "v": "3–11 bulan"
+   },
+   {
+    "v": "1–2 tahun"
+   },
+   {
+    "v": "Lebih dari 2 tahun"
+   }
+  ]
+ },
+ {
+  "id": "A11",
+  "key": "A11_pemilik",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "single",
+  "text": "Siapa pemilik kendaraan yang Anda gunakan untuk bekerja?",
+  "options": [
+   {
+    "v": "Milik sendiri"
+   },
+   {
+    "v": "Milik keluarga"
+   },
+   {
+    "v": "Sewa/rental"
+   },
+   {
+    "v": "Milik perusahaan/mitra"
+   },
+   {
+    "v": "Lainnya",
+    "other": true
    }
   ]
  },
  {
   "id": "B1",
-  "key": "B1_tempat_utama",
-  "sec": "Kebiasaan ngecas",
+  "key": "B1_jam_kerja",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
   "path": "ev",
-  "type": "single",
-  "text": "Di mana Anda paling sering mengisi daya?",
+  "type": "multi",
+  "max": 2,
+  "hint": "Pilih maksimal 2 rentang waktu yang paling menggambarkan jam kerja",
+  "text": "Pada hari kerja, kapan Anda biasanya mulai dan selesai beroperasi?",
   "options": [
    {
-    "v": "Di rumah",
-    "e": "🏠"
+    "v": "Dini hari (00.00–04.59)"
    },
    {
-    "v": "Di tempat kerja atau kantor",
-    "e": "🏢"
+    "v": "Pagi (05.00–09.59)"
    },
    {
-    "v": "Di charger umum (SPKLU, mal, SPBU, dan sejenisnya)",
-    "e": "⚡"
+    "v": "Siang (10.00–14.59)"
    },
    {
-    "v": "Tukar baterai di stasiun",
-    "e": "🔋"
+    "v": "Sore (15.00–18.59)"
    },
    {
-    "v": "Sama seringnya di beberapa tempat",
-    "e": "🔁"
+    "v": "Malam (19.00–23.59)"
    }
   ]
  },
  {
   "id": "B2",
-  "key": "B2_kondisi_rumah",
-  "sec": "Kebiasaan ngecas",
+  "key": "B2_tempat_utama",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
   "path": "ev",
   "type": "single",
-  "text": "Bagaimana kondisi mengisi daya di rumah Anda?",
+  "shuffle": true,
+  "text": "Di mana Anda paling sering mengisi daya kendaraan?",
   "options": [
    {
-    "v": "Bisa, lancar"
+    "v": "Di rumah"
    },
    {
-    "v": "Bisa, tapi dayanya terbatas atau colokan jauh"
+    "v": "Di tempat kerja/depo/kantor"
    },
    {
-    "v": "Tidak bisa, tinggal di apartemen atau kontrakan"
+    "v": "Di SPKLU/charger umum"
    },
    {
-    "v": "Tidak bisa, tidak ada tempat parkir sendiri"
+    "v": "Tukar baterai di stasiun (khusus kendaraan yang menggunakan sistem ini)"
    },
    {
-    "v": "Belum pasang charger di rumah"
+    "v": "Kombinasi beberapa tempat",
+    "fix": true,
+    "x": false
    }
   ]
  },
  {
   "id": "B3",
-  "key": "B3_frekuensi_umum",
-  "sec": "Kebiasaan ngecas",
+  "key": "B3_akses_rumah",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
   "path": "ev",
   "type": "single",
-  "text": "Dalam seminggu, berapa kali Anda mengisi daya di charger umum?",
+  "text": "Apakah Anda memiliki akses untuk mengisi daya di rumah?",
+  "options": [
+   {
+    "v": "Ya, bisa dan lancar"
+   },
+   {
+    "v": "Ya, tetapi daya/akses/parkir terbatas"
+   },
+   {
+    "v": "Tidak, tinggal di apartemen/kontrakan tanpa fasilitas"
+   },
+   {
+    "v": "Tidak, tidak memiliki parkir sendiri"
+   },
+   {
+    "v": "Belum memasang charger di rumah"
+   },
+   {
+    "v": "Tidak relevan untuk kendaraan saya (misalnya sistem tukar baterai)"
+   }
+  ]
+ },
+ {
+  "id": "B5",
+  "key": "B5_frekuensi_tukar_baterai",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam 30 hari terakhir, seberapa sering Anda menggunakan layanan tukar baterai?",
   "options": [
    {
     "v": "Tidak pernah"
    },
    {
-    "v": "Kurang dari 1 kali seminggu"
+    "v": "Kurang dari 1 kali per minggu"
    },
    {
-    "v": "1 sampai 2 kali"
+    "v": "1–2 kali per minggu"
    },
    {
-    "v": "3 sampai 4 kali"
+    "v": "3–4 kali per minggu"
    },
    {
-    "v": "5 kali atau lebih"
+    "v": "5 kali atau lebih per minggu"
+   },
+   {
+    "v": "Tidak berlaku untuk kendaraan saya"
    }
   ]
  },
  {
-  "id": "J1",
-  "key": "J1_jam",
-  "sec": "Saat ngecas di tempat umum",
+  "id": "B6",
+  "key": "B6_pemicu",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Apa yang biasanya menjadi pemicu Anda memutuskan untuk mengisi daya saat sedang bekerja?",
+  "options": [
+   {
+    "v": "Persentase baterai sudah rendah"
+   },
+   {
+    "v": "Memperkirakan baterai tidak cukup untuk menyelesaikan jam kerja"
+   },
+   {
+    "v": "Sedang melewati lokasi charger"
+   },
+   {
+    "v": "Ada jeda/istirahat atau pesanan sedang sepi"
+   },
+   {
+    "v": "Mengejar waktu sebelum jam sibuk"
+   },
+   {
+    "v": "Mengikuti arahan pemilik/perusahaan/aplikasi"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "B7",
+  "key": "B7_baterai_mulai",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "single",
+  "text": "Biasanya, pada kondisi baterai berapa Anda mulai mencari tempat pengisian?",
+  "options": [
+   {
+    "v": "Di bawah 10%"
+   },
+   {
+    "v": "10–19%"
+   },
+   {
+    "v": "20–39%"
+   },
+   {
+    "v": "40–59%"
+   },
+   {
+    "v": "60% atau lebih"
+   },
+   {
+    "v": "Tidak memiliki pola tetap",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "B8",
+  "key": "B8_penentu_lokasi",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Apa yang paling menentukan pilihan lokasi pengisian saat Anda sedang bekerja?",
+  "options": [
+   {
+    "v": "Dekat dengan rute atau posisi saya"
+   },
+   {
+    "v": "Dekat dengan area tujuan/order"
+   },
+   {
+    "v": "Ketersediaan charger dapat dipastikan"
+   },
+   {
+    "v": "Waktu pengisian lebih cepat"
+   },
+   {
+    "v": "Biaya lebih murah"
+   },
+   {
+    "v": "Mudah diakses dan tidak perlu memutar jauh"
+   },
+   {
+    "v": "Aman"
+   },
+   {
+    "v": "Ada tempat istirahat/toilet/makan"
+   },
+   {
+    "v": "Sudah terbiasa menggunakan lokasi tersebut"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "B9",
+  "key": "B9_penentu_keputusan",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "single",
+  "text": "Siapa yang biasanya menentukan lokasi pengisian daya?",
+  "options": [
+   {
+    "v": "Saya sendiri"
+   },
+   {
+    "v": "Pemilik kendaraan/atasan"
+   },
+   {
+    "v": "Aturan perusahaan/mitra/aplikasi"
+   },
+   {
+    "v": "Diputuskan bersama"
+   },
+   {
+    "v": "Bergantung situasi"
+   }
+  ]
+ },
+ {
+  "id": "B10",
+  "key": "B10_pembayar",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "single",
+  "text": "Siapa yang biasanya membayar biaya pengisian daya?",
+  "options": [
+   {
+    "v": "Saya sendiri"
+   },
+   {
+    "v": "Pemilik kendaraan/atasan"
+   },
+   {
+    "v": "Ditanggung perusahaan/mitra"
+   },
+   {
+    "v": "Dibagi"
+   },
+   {
+    "v": "Lainnya",
+    "other": true
+   }
+  ]
+ },
+ {
+  "id": "B4",
+  "key": "B4_frekuensi_charger_umum",
+  "sec": "Pola kerja dan kebiasaan pengisian daya",
+  "path": "ev",
+  "type": "single",
+  "hint": "Charger umum yang terhubung langsung ke kendaraan, bukan tukar baterai. Bila Tidak pernah, bagian pengalaman charger umum dilewati",
+  "text": "Dalam 30 hari terakhir, seberapa sering Anda mengisi daya di charger umum yang terhubung langsung ke kendaraan?",
+  "options": [
+   {
+    "v": "Tidak pernah"
+   },
+   {
+    "v": "Kurang dari 1 kali per minggu"
+   },
+   {
+    "v": "1–2 kali per minggu"
+   },
+   {
+    "v": "3–4 kali per minggu"
+   },
+   {
+    "v": "5 kali atau lebih per minggu"
+   }
+  ]
+ },
+ {
+  "id": "C1",
+  "key": "C1_operator",
+  "sec": "Pengalaman menggunakan charger umum",
   "path": "ev",
   "when": {
-   "id": "B3",
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "shuffle": true,
+  "hint": "Jawablah dengan mengingat pengalaman terakhir Anda. Boleh pilih lebih dari satu",
+  "text": "Jaringan/operator charger umum apa yang pernah Anda gunakan dalam 30 hari terakhir?",
+  "options": [
+   {
+    "v": "SPKLU PLN"
+   },
+   {
+    "v": "SPKLU/operator swasta"
+   },
+   {
+    "v": "Charger di mal, gedung, hotel, atau fasilitas komersial"
+   },
+   {
+    "v": "Charger di lokasi lain"
+   },
+   {
+    "v": "Tidak tahu nama operator",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "C2",
+  "key": "C2_pakai_spklu_pln",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Dalam 30 hari terakhir, apakah Anda pernah menggunakan SPKLU PLN?",
+  "options": [
+   {
+    "v": "Ya"
+   },
+   {
+    "v": "Tidak"
+   },
+   {
+    "v": "Tidak yakin/tidak tahu"
+   }
+  ]
+ },
+ {
+  "id": "C3",
+  "key": "C3_frekuensi_spklu_pln",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "eq": [
+    "Ya"
+   ]
+  },
+  "type": "single",
+  "text": "Kira-kira berapa kali Anda menggunakan SPKLU PLN dalam 30 hari terakhir?",
+  "options": [
+   {
+    "v": "1 kali"
+   },
+   {
+    "v": "2–3 kali"
+   },
+   {
+    "v": "4–7 kali"
+   },
+   {
+    "v": "8–15 kali"
+   },
+   {
+    "v": "Lebih dari 15 kali"
+   }
+  ]
+ },
+ {
+  "id": "C4",
+  "key": "C4_lokasi_spklu_pln",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "eq": [
+    "Ya"
+   ]
+  },
+  "type": "text",
+  "required": false,
+  "hint": "Isian singkat, boleh dilewati",
+  "text": "Di wilayah/lokasi mana Anda paling sering menggunakan SPKLU PLN?"
+ },
+ {
+  "id": "C5",
+  "key": "C5_cara_menemukan",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "eq": [
+    "Ya"
+   ]
+  },
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Bagaimana biasanya Anda menemukan SPKLU PLN yang akan digunakan?",
+  "options": [
+   {
+    "v": "PLN Mobile"
+   },
+   {
+    "v": "Google Maps/Waze"
+   },
+   {
+    "v": "Rekomendasi teman/komunitas"
+   },
+   {
+    "v": "Melihat langsung saat melintas"
+   },
+   {
+    "v": "Informasi dari petugas/mitra"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "C6",
+  "key": "C6_pengalaman_terakhir",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "eq": [
+    "Ya"
+   ]
+  },
+  "type": "single",
+  "text": "Secara keseluruhan, bagaimana pengalaman terakhir Anda menggunakan SPKLU PLN?",
+  "options": [
+   {
+    "v": "Sangat buruk"
+   },
+   {
+    "v": "Buruk"
+   },
+   {
+    "v": "Baik"
+   },
+   {
+    "v": "Sangat baik"
+   }
+  ]
+ },
+ {
+  "id": "C7",
+  "key": "C7_alasan_belum",
+  "sec": "Pengalaman menggunakan charger umum",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "eq": [
+    "Tidak",
+    "Tidak yakin/tidak tahu"
+   ]
+  },
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Apa alasan utama Anda belum menggunakan SPKLU PLN?",
+  "options": [
+   {
+    "v": "Tidak mengetahui lokasi SPKLU PLN"
+   },
+   {
+    "v": "Lokasinya tidak sesuai rute/area kerja"
+   },
+   {
+    "v": "Tidak yakin kendaraan kompatibel"
+   },
+   {
+    "v": "Lebih terbiasa menggunakan operator lain"
+   },
+   {
+    "v": "Biaya dianggap kurang menarik"
+   },
+   {
+    "v": "Khawatir charger penuh/rusak"
+   },
+   {
+    "v": "Proses aplikasi/pembayaran dirasa rumit"
+   },
+   {
+    "v": "Lebih mudah mengisi di rumah/tukar baterai"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "D1",
+  "key": "D1_cek_lokasi",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
    "ne": [
     "Tidak pernah"
    ]
   },
   "type": "multi",
   "max": 2,
-  "hint": "Pilih maksimal 2",
-  "text": "Biasanya jam berapa Anda mengisi daya di charger umum?",
+  "shuffle": true,
+  "hint": "Jawablah berdasarkan pengalaman terakhir Anda. Pilih maksimal 2",
+  "text": "Saat terakhir kali mencari charger umum, bagaimana Anda memeriksa lokasi dan ketersediaannya?",
   "options": [
    {
-    "v": "Dini hari (00.00–05.00)",
-    "e": "🌌"
+    "v": "Memeriksa aplikasi operator"
    },
    {
-    "v": "Pagi (05.00–10.00)",
-    "e": "🌅"
+    "v": "Memeriksa Google Maps/Waze"
    },
    {
-    "v": "Siang (10.00–15.00)",
-    "e": "☀️"
+    "v": "Bertanya kepada komunitas/teman"
    },
    {
-    "v": "Sore (15.00–19.00)",
-    "e": "🌇"
+    "v": "Menghubungi petugas/pusat layanan"
    },
    {
-    "v": "Malam (19.00–24.00)",
-    "e": "🌙"
+    "v": "Langsung datang tanpa memeriksa"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
    }
   ]
  },
  {
-  "id": "J2",
-  "key": "J2_lama_ngecas",
-  "sec": "Saat ngecas di tempat umum",
+  "id": "D2",
+  "key": "D2_kondisi_tiba",
+  "sec": "Rekonstruksi customer journey dan pain point",
   "path": "ev",
   "when": {
-   "id": "B3",
+   "id": "B4",
    "ne": [
     "Tidak pernah"
    ]
   },
   "type": "single",
-  "text": "Sekali mengisi daya di charger umum, biasanya berapa lama Anda berada di lokasi?",
+  "text": "Saat tiba di lokasi charger pada pengalaman terakhir, bagaimana kondisinya?",
+  "options": [
+   {
+    "v": "Charger tersedia dan langsung dapat digunakan"
+   },
+   {
+    "v": "Charger tersedia tetapi harus menunggu kurang dari 10 menit"
+   },
+   {
+    "v": "Menunggu 10–29 menit"
+   },
+   {
+    "v": "Menunggu 30 menit atau lebih"
+   },
+   {
+    "v": "Charger rusak/tidak dapat digunakan"
+   },
+   {
+    "v": "Informasi ketersediaan tidak sesuai kondisi aktual"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "D3",
+  "key": "D3_waktu_menuju",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Pada pengalaman terakhir, berapa lama waktu perjalanan dari posisi Anda menuju charger?",
+  "options": [
+   {
+    "v": "Kurang dari 5 menit"
+   },
+   {
+    "v": "5–10 menit"
+   },
+   {
+    "v": "11–20 menit"
+   },
+   {
+    "v": "21–30 menit"
+   },
+   {
+    "v": "Lebih dari 30 menit"
+   },
+   {
+    "v": "Tidak ingat",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "D4",
+  "key": "D4_waktu_menunggu",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Pada pengalaman terakhir, berapa lama Anda menunggu sebelum pengisian dimulai?",
+  "options": [
+   {
+    "v": "Tidak menunggu"
+   },
+   {
+    "v": "Kurang dari 10 menit"
+   },
+   {
+    "v": "10–29 menit"
+   },
+   {
+    "v": "30–59 menit"
+   },
+   {
+    "v": "60 menit atau lebih"
+   },
+   {
+    "v": "Charger tidak dapat digunakan/pindah lokasi",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "D5",
+  "key": "D5_durasi_isi",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Pada pengalaman terakhir, berapa lama proses pengisian daya berlangsung?",
   "options": [
    {
     "v": "Kurang dari 15 menit"
    },
    {
-    "v": "15 sampai 30 menit"
+    "v": "15–29 menit"
    },
    {
-    "v": "30 sampai 60 menit"
+    "v": "30–59 menit"
    },
    {
-    "v": "1 sampai 2 jam"
+    "v": "1–2 jam"
    },
    {
     "v": "Lebih dari 2 jam"
+   },
+   {
+    "v": "Tidak ingat",
+    "fix": true,
+    "x": false
    }
   ]
  },
  {
-  "id": "J3",
-  "key": "J3_penentu_lokasi",
-  "sec": "Saat ngecas di tempat umum",
+  "id": "D6",
+  "key": "D6_sesuai_perkiraan",
+  "sec": "Rekonstruksi customer journey dan pain point",
   "path": "ev",
   "when": {
-   "id": "B3",
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Pada pengalaman terakhir, apakah proses pengisian berjalan sesuai perkiraan waktu Anda?",
+  "options": [
+   {
+    "v": "Jauh lebih cepat dari perkiraan"
+   },
+   {
+    "v": "Sedikit lebih cepat"
+   },
+   {
+    "v": "Sesuai perkiraan"
+   },
+   {
+    "v": "Sedikit lebih lama"
+   },
+   {
+    "v": "Jauh lebih lama"
+   },
+   {
+    "v": "Tidak tahu/tidak memperkirakan",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "D7",
+  "key": "D7_saat_menunggu",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Saat menunggu pengisian, apa yang biasanya Anda lakukan?",
+  "options": [
+   {
+    "v": "Tetap berada di kendaraan"
+   },
+   {
+    "v": "Makan/minum"
+   },
+   {
+    "v": "Beristirahat"
+   },
+   {
+    "v": "Menggunakan aplikasi kerja/memeriksa pesanan"
+   },
+   {
+    "v": "Berbelanja/beraktivitas di sekitar"
+   },
+   {
+    "v": "Pergi dan kembali setelah pengisian selesai"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "D8",
+  "key": "D8_tetap_menerima_pesanan",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Apakah Anda tetap dapat menerima atau menjalankan pesanan ketika kendaraan sedang mengisi daya?",
+  "options": [
+   {
+    "v": "Ya, seperti biasa"
+   },
+   {
+    "v": "Ya, tetapi terbatas"
+   },
+   {
+    "v": "Tidak, karena harus menunggu di kendaraan/lokasi"
+   },
+   {
+    "v": "Tidak, karena kendaraan tidak dapat digunakan"
+   },
+   {
+    "v": "Tidak berlaku untuk pekerjaan saya"
+   }
+  ]
+ },
+ {
+  "id": "D9",
+  "key": "D9_kendala",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "multi",
+  "shuffle": true,
+  "hint": "Pilih semua yang relevan. Pilihan Tidak mengalami kendala tidak dapat digabung",
+  "text": "Pada pengalaman terakhir, apakah Anda mengalami kendala berikut?",
+  "options": [
+   {
+    "v": "Sulit menemukan lokasi charger"
+   },
+   {
+    "v": "Informasi ketersediaan tidak akurat"
+   },
+   {
+    "v": "Antrean"
+   },
+   {
+    "v": "Charger rusak/tidak berfungsi"
+   },
+   {
+    "v": "Konektor/kompatibilitas tidak sesuai"
+   },
+   {
+    "v": "Pengisian lebih lambat dari perkiraan"
+   },
+   {
+    "v": "Aplikasi sulit digunakan"
+   },
+   {
+    "v": "Pembayaran gagal/rumit"
+   },
+   {
+    "v": "Biaya tidak jelas/terasa mahal"
+   },
+   {
+    "v": "Area tidak aman/tidak nyaman"
+   },
+   {
+    "v": "Tidak ada petugas/bantuan"
+   },
+   {
+    "v": "Tidak mengalami kendala",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "D10",
+  "key": "D10_paling_mengganggu",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
    "ne": [
     "Tidak pernah"
    ]
   },
   "type": "single",
   "shuffle": true,
-  "text": "Apa yang paling menentukan pilihan lokasi charger umum Anda?",
+  "text": "Dari kendala tersebut, mana yang paling mengganggu Anda?",
   "options": [
    {
-    "v": "Dekat rute atau tujuan saya",
-    "e": "📍"
+    "v": "Sulit menemukan lokasi"
    },
    {
-    "v": "Charger pasti tersedia",
-    "e": "✅"
+    "v": "Informasi ketersediaan tidak akurat"
    },
    {
-    "v": "Harga lebih murah",
-    "e": "💸"
+    "v": "Antrean"
    },
    {
-    "v": "Pengisian lebih cepat",
-    "e": "⚡"
+    "v": "Charger rusak/tidak berfungsi"
    },
    {
-    "v": "Ada tempat makan atau belanja di sekitar",
-    "e": "🛍️"
+    "v": "Konektor/kompatibilitas"
    },
    {
-    "v": "Tempatnya aman dan nyaman",
-    "e": "🛡️"
+    "v": "Pengisian lambat"
    },
    {
-    "v": "Sudah terbiasa di sana",
-    "e": "🔁"
+    "v": "Aplikasi"
    },
    {
-    "v": "Tidak ada yang spesifik",
-    "e": "🤷",
-    "fix": true
+    "v": "Pembayaran"
+   },
+   {
+    "v": "Biaya"
+   },
+   {
+    "v": "Keamanan/kenyamanan"
+   },
+   {
+    "v": "Tidak ada petugas/bantuan"
+   },
+   {
+    "v": "Tidak ada kendala",
+    "fix": true,
+    "x": false
    }
   ]
  },
  {
-  "id": "J4",
-  "key": "J4_kondisi_tiba",
-  "sec": "Saat ngecas di tempat umum",
+  "id": "D11",
+  "key": "D11",
+  "sec": "Rekonstruksi customer journey dan pain point",
   "path": "ev",
   "when": {
-   "id": "B3",
-   "ne": [
-    "Tidak pernah"
-   ]
-  },
-  "type": "single",
-  "text": "Saat terakhir kali tiba di charger umum, bagaimana kondisinya?",
-  "options": [
-   {
-    "v": "Charger langsung kosong"
-   },
-   {
-    "v": "Menunggu kurang dari 10 menit"
-   },
-   {
-    "v": "Menunggu 10 sampai 30 menit"
-   },
-   {
-    "v": "Menunggu lebih dari 30 menit"
-   },
-   {
-    "v": "Charger rusak atau tidak bisa dipakai, saya pindah lokasi"
-   },
-   {
-    "v": "Saya tidak ingat",
-    "fix": true
-   }
-  ]
- },
- {
-  "id": "J5",
-  "key": "J5",
-  "sec": "Saat ngecas di tempat umum",
-  "path": "ev",
-  "when": {
-   "id": "B3",
+   "id": "B4",
    "ne": [
     "Tidak pernah"
    ]
@@ -527,32 +1395,37 @@ const Q = [
    "min": "Sangat sulit",
    "max": "Sangat mudah"
   },
+  "na": "Tidak mengalami/tidak relevan",
   "hint": "Pilih angka 1–4 untuk tiap baris. 1 = Sangat sulit, 2 = Cukup sulit, 3 = Cukup mudah, 4 = Sangat mudah",
-  "text": "Seberapa mudah tahap-tahap ini bagi Anda saat mengisi daya di charger umum?",
+  "text": "Seberapa mudah tahap berikut saat menggunakan charger umum?",
   "rows": [
    {
     "k": "cari_lokasi",
-    "v": "Mencari charger yang cocok"
+    "v": "Mencari lokasi charger yang sesuai"
    },
    {
-    "k": "cek_ketersediaan",
-    "v": "Mengecek apakah charger tersedia"
+    "k": "pastikan_tersedia",
+    "v": "Memastikan charger tersedia dan berfungsi"
    },
    {
-    "k": "menunggu_giliran",
-    "v": "Menunggu giliran"
+    "k": "menuju_lokasi",
+    "v": "Menuju lokasi dan menemukan area charger"
    },
    {
     "k": "mulai_isi",
-    "v": "Memulai pengisian (colok dan aktivasi)"
+    "v": "Mengakses/memulai pengisian"
    },
    {
-    "k": "membayar",
-    "v": "Membayar"
+    "k": "bayar",
+    "v": "Melakukan pembayaran"
    },
    {
-    "k": "menunggu_selesai",
-    "v": "Menunggu sampai pengisian selesai"
+    "k": "pantau",
+    "v": "Memantau proses dan mengetahui sisa waktu"
+   },
+   {
+    "k": "kembali_kerja",
+    "v": "Menyelesaikan pengisian dan kembali bekerja"
    }
   ],
   "cols": [
@@ -563,12 +1436,113 @@ const Q = [
   ]
  },
  {
-  "id": "J6",
-  "key": "J6_saat_menunggu",
-  "sec": "Saat ngecas di tempat umum",
+  "id": "D12",
+  "key": "D12",
+  "sec": "Rekonstruksi customer journey dan pain point",
   "path": "ev",
   "when": {
-   "id": "B3",
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "grid",
+  "shuffleRows": true,
+  "hint": "Pilih satu jawaban untuk tiap baris",
+  "text": "Dalam 30 hari terakhir, seberapa sering Anda mengalami hal-hal berikut?",
+  "rows": [
+   {
+    "k": "antre",
+    "v": "Harus mengantre sebelum mengisi"
+   },
+   {
+    "k": "charger_rusak",
+    "v": "Charger rusak/tidak dapat digunakan"
+   },
+   {
+    "k": "info_salah",
+    "v": "Informasi ketersediaan tidak sesuai kondisi aktual"
+   },
+   {
+    "k": "isi_lambat",
+    "v": "Pengisian lebih lambat dari perkiraan"
+   },
+   {
+    "k": "aplikasi",
+    "v": "Aplikasi bermasalah"
+   },
+   {
+    "k": "pembayaran",
+    "v": "Pembayaran gagal/bermasalah"
+   },
+   {
+    "k": "lokasi_sulit",
+    "v": "Lokasi sulit ditemukan"
+   },
+   {
+    "k": "area_tunggu",
+    "v": "Area menunggu tidak nyaman/tidak aman"
+   },
+   {
+    "k": "tanpa_bantuan",
+    "v": "Tidak ada bantuan saat terjadi masalah"
+   }
+  ],
+  "cols": [
+   "Tidak pernah",
+   "1 kali",
+   "2–3 kali",
+   "4 kali atau lebih",
+   "Tidak ingat"
+  ]
+ },
+ {
+  "id": "D13",
+  "key": "D13_saat_penuh",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "shuffle": true,
+  "text": "Jika charger penuh atau tidak dapat digunakan, apa yang biasanya Anda lakukan?",
+  "options": [
+   {
+    "v": "Menunggu di lokasi"
+   },
+   {
+    "v": "Pindah ke charger lain yang dekat"
+   },
+   {
+    "v": "Pindah ke lokasi yang lebih jauh"
+   },
+   {
+    "v": "Menghentikan/mengurangi aktivitas kerja dan mengisi nanti"
+   },
+   {
+    "v": "Mengisi di rumah/tempat lain"
+   },
+   {
+    "v": "Menghubungi petugas/pusat layanan"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "D14",
+  "key": "D14_kanal_bantuan",
+  "sec": "Rekonstruksi customer journey dan pain point",
+  "path": "ev",
+  "when": {
+   "id": "B4",
    "ne": [
     "Tidak pernah"
    ]
@@ -577,254 +1551,27 @@ const Q = [
   "max": 2,
   "shuffle": true,
   "hint": "Pilih maksimal 2",
-  "text": "Saat menunggu pengisian daya, biasanya Anda...",
+  "text": "Jika mengalami masalah, melalui kanal apa Anda biasanya mencari bantuan?",
   "options": [
    {
-    "v": "Tetap di kendaraan sambil memegang HP",
-    "e": "📱"
+    "v": "Petugas di lokasi"
    },
    {
-    "v": "Makan atau minum",
-    "e": "☕"
+    "v": "PLN Mobile/aplikasi operator"
    },
    {
-    "v": "Belanja atau jalan di sekitar",
-    "e": "🛍️"
+    "v": "Call center/pusat layanan"
    },
    {
-    "v": "Istirahat atau tidur",
-    "e": "😴"
+    "v": "Komunitas/teman"
    },
    {
-    "v": "Mengecek aplikasi kerja atau order",
-    "e": "💼"
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
    },
    {
-    "v": "Ngobrol dengan orang lain",
-    "e": "💬"
-   },
-   {
-    "v": "Ke toilet atau musala",
-    "e": "🚻"
-   },
-   {
-    "v": "Pergi dulu dan kembali nanti",
-    "e": "🚶"
-   },
-   {
-    "v": "Menunggu saja tanpa melakukan apa pun",
-    "e": "⏳",
-    "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "J7",
-  "key": "J7_tempat_dikunjungi",
-  "sec": "Saat ngecas di tempat umum",
-  "path": "ev",
-  "when": {
-   "id": "B3",
-   "ne": [
-    "Tidak pernah"
-   ]
-  },
-  "type": "multi",
-  "max": 3,
-  "shuffle": true,
-  "hint": "Pilih maksimal 3",
-  "text": "Di sekitar charger umum, tempat apa yang biasanya Anda kunjungi?",
-  "options": [
-   {
-    "v": "Kafe atau kedai kopi",
-    "e": "☕"
-   },
-   {
-    "v": "Restoran atau warung makan",
-    "e": "🍜"
-   },
-   {
-    "v": "Minimarket",
-    "e": "🏪"
-   },
-   {
-    "v": "Mal atau pusat belanja",
-    "e": "🏬"
-   },
-   {
-    "v": "Toko ritel lain",
-    "e": "🛒"
-   },
-   {
-    "v": "Bengkel atau cuci kendaraan",
-    "e": "🛠️"
-   },
-   {
-    "v": "Apotek",
-    "e": "💊"
-   },
-   {
-    "v": "Tempat ibadah",
-    "e": "🕌"
-   },
-   {
-    "v": "Tidak mengunjungi tempat apa pun",
-    "e": "🙅",
-    "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "J8",
-  "key": "J8_belanja",
-  "sec": "Saat ngecas di tempat umum",
-  "path": "ev",
-  "when": {
-   "id": "B3",
-   "ne": [
-    "Tidak pernah"
-   ]
-  },
-  "type": "single",
-  "text": "Rata-rata, berapa uang yang Anda belanjakan di sekitar charger setiap kali mengisi daya?",
-  "options": [
-   {
-    "v": "Tidak belanja"
-   },
-   {
-    "v": "Kurang dari Rp25 ribu"
-   },
-   {
-    "v": "Rp25–50 ribu"
-   },
-   {
-    "v": "Rp50–100 ribu"
-   },
-   {
-    "v": "Lebih dari Rp100 ribu"
-   }
-  ]
- },
- {
-  "id": "J9",
-  "key": "J9_paling_mengganggu",
-  "sec": "Saat ngecas di tempat umum",
-  "path": "ev",
-  "when": {
-   "id": "B3",
-   "ne": [
-    "Tidak pernah"
-   ]
-  },
-  "type": "multi",
-  "max": 3,
-  "shuffle": true,
-  "hint": "Pilih maksimal 3",
-  "text": "Dalam 6 bulan terakhir, hal apa yang paling mengganggu Anda di charger umum?",
-  "options": [
-   {
-    "v": "Harus antre",
-    "e": "⏳"
-   },
-   {
-    "v": "Charger rusak atau tidak bisa dipakai",
-    "e": "🔧"
-   },
-   {
-    "v": "Charger terpakai oleh kendaraan yang sudah selesai tetapi belum dipindah",
-    "e": "🚙"
-   },
-   {
-    "v": "Lokasi sulit dicari",
-    "e": "🗺️"
-   },
-   {
-    "v": "Aplikasi atau pembayaran gagal",
-    "e": "📲"
-   },
-   {
-    "v": "Biaya terasa mahal",
-    "e": "💸"
-   },
-   {
-    "v": "Tempat menunggu tidak nyaman",
-    "e": "🥵"
-   },
-   {
-    "v": "Merasa kurang aman",
-    "e": "🌚"
-   },
-   {
-    "v": "Tidak ada yang mengganggu",
-    "e": "👌",
-    "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "B4",
-  "key": "B4_biaya_bulanan",
-  "sec": "Biaya dan aplikasi",
-  "path": "ev",
-  "type": "single",
-  "text": "Kira-kira berapa biaya mengisi daya Anda dalam sebulan, di semua tempat?",
-  "options": [
-   {
-    "v": "Kurang dari Rp300 ribu"
-   },
-   {
-    "v": "Rp300–600 ribu"
-   },
-   {
-    "v": "Rp600 ribu–1 juta"
-   },
-   {
-    "v": "Rp1–1,5 juta"
-   },
-   {
-    "v": "Rp1,5–2,5 juta"
-   },
-   {
-    "v": "Lebih dari Rp2,5 juta"
-   },
-   {
-    "v": "Tidak tahu",
-    "fix": true
-   }
-  ]
- },
- {
-  "id": "B5",
-  "key": "B5_aplikasi",
-  "sec": "Biaya dan aplikasi",
-  "path": "ev",
-  "type": "multi",
-  "shuffle": true,
-  "hint": "Boleh pilih lebih dari satu",
-  "text": "Aplikasi apa yang Anda pakai untuk mengisi daya atau mencari charger?",
-  "options": [
-   {
-    "v": "PLN Mobile",
-    "e": "⚡"
-   },
-   {
-    "v": "Google Maps atau Waze",
-    "e": "🗺️"
-   },
-   {
-    "v": "Aplikasi charger milik operator lain",
-    "e": "📲"
-   },
-   {
-    "v": "Grup WhatsApp atau komunitas",
-    "e": "💬"
-   },
-   {
-    "v": "Tidak pakai aplikasi",
-    "e": "🙅",
+    "v": "Tidak mencari bantuan",
     "fix": true,
     "x": true
    }
@@ -832,52 +1579,248 @@ const Q = [
  },
  {
   "id": "E1",
-  "key": "E1_perasaan",
-  "sec": "Pengalaman dan harapan",
+  "key": "E1_kurangi_waktu",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
   "path": "ev",
   "type": "single",
-  "shuffle": true,
-  "text": "Saat harus mengisi daya di luar rumah, perasaan apa yang paling sering Anda rasakan?",
+  "hint": "Jawaban berupa perkiraan diperbolehkan",
+  "text": "Dalam 30 hari terakhir, apakah proses pengisian daya pernah mengurangi waktu Anda untuk menerima atau menyelesaikan pesanan?",
   "options": [
    {
-    "v": "Tenang, tidak ada masalah",
-    "e": "😌"
+    "v": "Ya, sering"
    },
    {
-    "v": "Biasa saja",
-    "e": "😐"
+    "v": "Ya, beberapa kali"
    },
    {
-    "v": "Sedikit cemas",
-    "e": "😕"
+    "v": "Ya, satu kali"
    },
    {
-    "v": "Cemas sekali",
-    "e": "😰"
+    "v": "Tidak pernah"
    },
    {
-    "v": "Kesal",
-    "e": "😤"
-   },
-   {
-    "v": "Lelah",
-    "e": "🥱"
-   },
-   {
-    "v": "Bosan",
-    "e": "😑"
-   },
-   {
-    "v": "Biasanya saya tidak perlu mengisi daya di luar rumah",
-    "e": "🏠",
-    "fix": true
+    "v": "Tidak yakin"
    }
   ]
  },
  {
   "id": "E2",
-  "key": "E2",
-  "sec": "Pengalaman dan harapan",
+  "key": "E2_waktu_hilang",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "when": {
+   "id": "E1",
+   "ne": [
+    "Tidak pernah"
+   ]
+  },
+  "type": "single",
+  "text": "Dalam satu kejadian pengisian daya, kira-kira berapa lama waktu kerja produktif yang hilang?",
+  "options": [
+   {
+    "v": "Tidak ada"
+   },
+   {
+    "v": "Kurang dari 15 menit"
+   },
+   {
+    "v": "15–29 menit"
+   },
+   {
+    "v": "30–59 menit"
+   },
+   {
+    "v": "1–2 jam"
+   },
+   {
+    "v": "Lebih dari 2 jam"
+   },
+   {
+    "v": "Sulit memperkirakan",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "E3",
+  "key": "E3_tolak_pesanan",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam 30 hari terakhir, apakah Anda pernah menolak, membatalkan, atau berhenti menerima pesanan karena baterai perlu diisi?",
+  "options": [
+   {
+    "v": "Ya, beberapa kali"
+   },
+   {
+    "v": "Ya, satu kali"
+   },
+   {
+    "v": "Tidak pernah"
+   },
+   {
+    "v": "Tidak ingat"
+   }
+  ]
+ },
+ {
+  "id": "E4",
+  "key": "E4_kehilangan_pendapatan",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "type": "single",
+  "text": "Dalam 30 hari terakhir, apakah antrean, charger rusak, atau masalah pengisian membuat Anda kehilangan peluang pendapatan?",
+  "options": [
+   {
+    "v": "Ya"
+   },
+   {
+    "v": "Tidak"
+   },
+   {
+    "v": "Tidak yakin"
+   }
+  ]
+ },
+ {
+  "id": "E5",
+  "key": "E5_nilai_hilang",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "when": {
+   "id": "E4",
+   "eq": [
+    "Ya"
+   ]
+  },
+  "type": "single",
+  "text": "Berapa perkiraan nilai peluang pendapatan yang hilang dalam 30 hari terakhir?",
+  "options": [
+   {
+    "v": "Kurang dari Rp25.000"
+   },
+   {
+    "v": "Rp25.000–Rp49.999"
+   },
+   {
+    "v": "Rp50.000–Rp99.999"
+   },
+   {
+    "v": "Rp100.000–Rp199.999"
+   },
+   {
+    "v": "Rp200.000 atau lebih"
+   },
+   {
+    "v": "Sulit memperkirakan",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "E6",
+  "key": "E6_dampak_terbesar",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Apa dampak paling besar dari kendala pengisian daya terhadap pekerjaan Anda?",
+  "options": [
+   {
+    "v": "Waktu online/aktif berkurang"
+   },
+   {
+    "v": "Pendapatan berkurang"
+   },
+   {
+    "v": "Harus menjauh dari area order"
+   },
+   {
+    "v": "Membatalkan/menolak pesanan"
+   },
+   {
+    "v": "Stres/kelelahan"
+   },
+   {
+    "v": "Mengubah jadwal kerja"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   },
+   {
+    "v": "Tidak berdampak signifikan",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "E7",
+  "key": "E7_pengaruh_ketersediaan",
+  "sec": "Dampak terhadap produktivitas dan pendapatan",
+  "path": "ev",
+  "type": "single",
+  "text": "Seberapa besar pengaruh kepastian ketersediaan charger terhadap keputusan Anda untuk tetap bekerja di suatu area?",
+  "options": [
+   {
+    "v": "1 Tidak berpengaruh"
+   },
+   {
+    "v": "2 Sedikit berpengaruh"
+   },
+   {
+    "v": "3 Cukup berpengaruh"
+   },
+   {
+    "v": "4 Berpengaruh"
+   },
+   {
+    "v": "5 Sangat berpengaruh"
+   }
+  ]
+ },
+ {
+  "id": "F1",
+  "key": "F1_perasaan",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Saat harus mengisi daya di luar rumah ketika sedang bekerja, perasaan apa yang paling sering Anda rasakan?",
+  "options": [
+   {
+    "v": "Tenang/tidak khawatir"
+   },
+   {
+    "v": "Biasa saja"
+   },
+   {
+    "v": "Sedikit cemas"
+   },
+   {
+    "v": "Sangat cemas"
+   },
+   {
+    "v": "Kesal/frustrasi"
+   },
+   {
+    "v": "Lelah/bosan"
+   },
+   {
+    "v": "Bergantung situasi",
+    "fix": true,
+    "x": false
+   }
+  ]
+ },
+ {
+  "id": "F2",
+  "key": "F2",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
   "path": "ev",
   "type": "grid",
   "shuffleRows": true,
@@ -885,32 +1828,37 @@ const Q = [
    "min": "Sangat tidak setuju",
    "max": "Sangat setuju"
   },
+  "na": "Tidak relevan",
   "hint": "Pilih angka 1–4 untuk tiap pernyataan. 1 = Sangat tidak setuju, 2 = Tidak setuju, 3 = Setuju, 4 = Sangat setuju",
   "text": "Seberapa setuju Anda dengan pernyataan berikut?",
   "rows": [
    {
-    "k": "biaya_wajar",
-    "v": "Biaya mengisi daya di tempat umum masuk akal"
+    "k": "perkirakan_baik",
+    "v": "Saya dapat memperkirakan lokasi dan waktu pengisian dengan baik"
    },
    {
-    "k": "cari_charger_lama",
-    "v": "Mencari charger yang kosong sering menyita waktu"
+    "k": "khawatir_penuh",
+    "v": "Saya khawatir charger yang dituju ternyata penuh atau rusak"
    },
    {
-    "k": "tenang_jauh",
-    "v": "Saya merasa tenang bepergian jauh dengan kendaraan listrik"
+    "k": "ganggu_produktif",
+    "v": "Waktu pengisian mengganggu jam produktif saya"
    },
    {
-    "k": "suka_aktivitas",
-    "v": "Saya lebih suka mengisi daya di tempat yang ada hal lain untuk dilakukan"
+    "k": "biaya_sebanding",
+    "v": "Biaya pengisian masih sebanding dengan pendapatan kerja"
    },
    {
-    "k": "promo_pengaruh",
-    "v": "Promo atau diskon memengaruhi pilihan tempat saya mengisi daya"
+    "k": "info_membantu",
+    "v": "Informasi di aplikasi membantu saya mengambil keputusan"
    },
    {
-    "k": "banyak_aplikasi",
-    "v": "Memakai banyak aplikasi untuk mengisi daya itu merepotkan"
+    "k": "aman_menunggu",
+    "v": "Saya merasa aman saat menunggu di area charger"
+   },
+   {
+    "k": "bayar_sederhana",
+    "v": "Saya membutuhkan proses pembayaran yang sederhana"
    }
   ],
   "cols": [
@@ -921,532 +1869,390 @@ const Q = [
   ]
  },
  {
-  "id": "E3",
-  "key": "E3_diceritakan",
-  "sec": "Pengalaman dan harapan",
+  "id": "F3",
+  "key": "F3_keluhan",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
   "path": "ev",
-  "type": "single",
-  "shuffle": true,
-  "text": "Apa yang paling sering Anda ceritakan ke teman atau keluarga tentang kendaraan listrik?",
-  "options": [
-   {
-    "v": "Hemat biaya bahan bakar",
-    "e": "💰"
-   },
-   {
-    "v": "Nyaman dan tenang dikendarai",
-    "e": "😌"
-   },
-   {
-    "v": "Ramah lingkungan",
-    "e": "🌱"
-   },
-   {
-    "v": "Repot mencari charger",
-    "e": "🔎"
-   },
-   {
-    "v": "Repot antre atau menunggu",
-    "e": "⏳"
-   },
-   {
-    "v": "Biaya perawatan atau baterai",
-    "e": "🔋"
-   },
-   {
-    "v": "Saya tidak pernah bercerita soal ini",
-    "e": "🤐",
-    "fix": true
-   }
-  ]
+  "type": "text",
+  "required": false,
+  "hint": "Isian terbuka, boleh dilewati",
+  "text": "Apa satu hal yang paling sering Anda keluhkan atau ceritakan kepada sesama driver tentang pengisian daya?"
  },
  {
-  "id": "E4",
-  "key": "E4_harapan",
-  "sec": "Pengalaman dan harapan",
+  "id": "F4",
+  "key": "F4_harapan",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
   "path": "ev",
   "type": "multi",
   "max": 3,
   "shuffle": true,
   "hint": "Pilih maksimal 3",
-  "text": "Dari daftar ini, apa yang paling Anda harapkan dari layanan pengisian daya?",
+  "text": "Apa tiga hal yang paling Anda harapkan dari layanan charger umum?",
   "options": [
    {
-    "v": "Charger selalu tersedia",
-    "e": "✅"
+    "v": "Informasi ketersediaan real-time yang akurat"
    },
    {
-    "v": "Biaya mengisi daya lebih hemat",
-    "e": "💸"
+    "v": "Informasi estimasi antrean dan waktu pengisian"
    },
    {
-    "v": "Pembayaran mudah dan cepat",
-    "e": "📲"
+    "v": "Lokasi charger lebih dekat dengan area kerja/rute"
    },
    {
-    "v": "Ada hal menyenangkan saat menunggu",
-    "e": "🎟️"
+    "v": "Charger selalu berfungsi dan terawat"
    },
    {
-    "v": "Pengisian lebih cepat",
-    "e": "⚡"
+    "v": "Pengisian lebih cepat"
    },
    {
-    "v": "Lokasi charger lebih banyak",
-    "e": "📍"
+    "v": "Biaya transparan dan kompetitif"
    },
    {
-    "v": "Informasi ketersediaan charger secara langsung",
-    "e": "📡"
+    "v": "Pembayaran mudah"
    },
    {
-    "v": "Tempat pengisian yang aman",
-    "e": "🛡️"
+    "v": "Bantuan cepat saat terjadi kendala"
    },
    {
-    "v": "Tidak ada harapan khusus",
-    "e": "🤷",
+    "v": "Area aman dan nyaman"
+   },
+   {
+    "v": "Fasilitas istirahat/toilet/makan"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "F5",
+  "key": "F5_prioritas_perbaikan",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
+  "path": "ev",
+  "type": "single",
+  "shuffle": true,
+  "text": "Jika hanya satu hal yang dapat diperbaiki terlebih dahulu, apa yang paling Anda prioritaskan?",
+  "options": [
+   {
+    "v": "Ketersediaan charger"
+   },
+   {
+    "v": "Keandalan/performa charger"
+   },
+   {
+    "v": "Kecepatan pengisian"
+   },
+   {
+    "v": "Lokasi dan aksesibilitas"
+   },
+   {
+    "v": "Harga dan transparansi biaya"
+   },
+   {
+    "v": "Aplikasi dan informasi"
+   },
+   {
+    "v": "Pembayaran"
+   },
+   {
+    "v": "Bantuan petugas"
+   },
+   {
+    "v": "Fasilitas dan keamanan"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "F6",
+  "key": "F6_fitur_informasi",
+  "sec": "Perasaan, persepsi, dan kebutuhan",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Fitur informasi apa yang paling membantu Anda sebelum memutuskan menuju SPKLU?",
+  "options": [
+   {
+    "v": "Status charger tersedia/terpakai/rusak"
+   },
+   {
+    "v": "Estimasi waktu antre"
+   },
+   {
+    "v": "Estimasi durasi dan biaya pengisian"
+   },
+   {
+    "v": "Kesesuaian konektor/daya dengan kendaraan"
+   },
+   {
+    "v": "Jarak dan estimasi waktu tempuh"
+   },
+   {
+    "v": "Rekomendasi SPKLU alternatif"
+   },
+   {
+    "v": "Informasi fasilitas di lokasi"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "G1",
+  "key": "G1_pemicu_mencoba",
+  "sec": "Pengguna yang belum pernah menggunakan SPKLU PLN",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "ne": [
+    "Ya"
+   ],
+   "unanswered": true
+  },
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Apa yang paling mungkin membuat Anda mencoba SPKLU PLN?",
+  "options": [
+   {
+    "v": "Lokasi dekat dengan area/rute kerja"
+   },
+   {
+    "v": "Informasi ketersediaan yang dapat dipercaya"
+   },
+   {
+    "v": "Kepastian kompatibilitas dengan kendaraan"
+   },
+   {
+    "v": "Biaya yang jelas dan kompetitif"
+   },
+   {
+    "v": "Proses aplikasi/pembayaran mudah"
+   },
+   {
+    "v": "Rekomendasi driver lain"
+   },
+   {
+    "v": "Fasilitas dan keamanan lokasi"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "G2",
+  "key": "G2_kemungkinan_mencoba",
+  "sec": "Pengguna yang belum pernah menggunakan SPKLU PLN",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "ne": [
+    "Ya"
+   ],
+   "unanswered": true
+  },
+  "type": "single",
+  "text": "Seberapa besar kemungkinan Anda mencoba SPKLU PLN dalam 3 bulan ke depan jika tersedia di lokasi yang sesuai kebutuhan Anda?",
+  "options": [
+   {
+    "v": "1 Sangat kecil"
+   },
+   {
+    "v": "2 Kecil"
+   },
+   {
+    "v": "3 Sedang"
+   },
+   {
+    "v": "4 Besar"
+   },
+   {
+    "v": "5 Sangat besar"
+   }
+  ]
+ },
+ {
+  "id": "G3",
+  "key": "G3_kekhawatiran",
+  "sec": "Pengguna yang belum pernah menggunakan SPKLU PLN",
+  "path": "ev",
+  "when": {
+   "id": "C2",
+   "ne": [
+    "Ya"
+   ],
+   "unanswered": true
+  },
+  "type": "text",
+  "required": false,
+  "hint": "Isian terbuka, boleh dilewati",
+  "text": "Apa kekhawatiran utama Anda jika akan menggunakan SPKLU PLN?"
+ },
+ {
+  "id": "H1",
+  "key": "H1_fasilitas",
+  "sec": "Potensi fasilitas dan mitra di sekitar SPKLU",
+  "path": "ev",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Fasilitas apa yang paling Anda butuhkan di sekitar lokasi charger saat menunggu?",
+  "options": [
+   {
+    "v": "Tempat duduk/area teduh"
+   },
+   {
+    "v": "Ruang ber-AC"
+   },
+   {
+    "v": "Toilet bersih"
+   },
+   {
+    "v": "Musala"
+   },
+   {
+    "v": "Makanan dan minuman"
+   },
+   {
+    "v": "Colokan untuk ponsel/Wi-Fi"
+   },
+   {
+    "v": "Parkir aman"
+   },
+   {
+    "v": "Tempat istirahat"
+   },
+   {
+    "v": "Petugas yang dapat membantu"
+   },
+   {
+    "v": "Informasi antrean dan sisa waktu"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   },
+   {
+    "v": "Tidak membutuhkan fasilitas tambahan",
     "fix": true,
     "x": true
    }
   ]
  },
  {
-  "id": "K0",
-  "key": "",
-  "sec": "Layanan langganan",
+  "id": "H2",
+  "key": "H2_jenis_tempat",
+  "sec": "Potensi fasilitas dan mitra di sekitar SPKLU",
   "path": "ev",
-  "type": "concept",
-  "text": "Gambaran layanan langganan yang sedang dirancang",
-  "konsep": {
-   "judul": "Gambaran layanan langganan yang sedang dirancang",
-   "isi": "Layanan ini masih dalam tahap rancangan, jadi isinya hanya contoh. Anda membayar biaya bulanan tetap lewat aplikasi PLN Mobile, lalu mendapat paket manfaat. Bacalah sebentar, lalu jawab pertanyaan berikutnya.",
-   "fitur": [
-    {
-     "e": "🎟️",
-     "t": "Voucher tenant",
-     "d": "Voucher dari kafe, restoran, dan toko di sekitar lokasi charger. Nilai satu voucher sekitar Rp25.000. Tersedia di kota tertentu."
-    },
-    {
-     "e": "⚡",
-     "t": "Potongan biaya ngecas",
-     "d": "Potongan dari biaya layanan pengisian daya di charger PLN."
-    },
-    {
-     "e": "⭐",
-     "t": "Poin tiap ngecas",
-     "d": "Setiap pengisian daya menghasilkan poin yang bisa ditukar."
-    },
-    {
-     "e": "🛠️",
-     "t": "Diskon perawatan",
-     "d": "Potongan harga di bengkel atau tempat cuci kendaraan mitra."
-    }
-   ],
-   "catatan": "Isi dan harga paket di pertanyaan berikutnya hanya contoh untuk meminta pendapat Anda, belum final."
-  }
- },
- {
-  "id": "K1",
-  "key": "K1_minat",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "single",
-  "text": "Seberapa tertarik Anda dengan layanan langganan seperti ini?",
+  "type": "multi",
+  "max": 3,
+  "shuffle": true,
+  "hint": "Pilih maksimal 3",
+  "text": "Jenis tempat apa yang paling bermanfaat jika tersedia di dekat SPKLU?",
   "options": [
    {
-    "v": "Sangat tertarik",
-    "e": "🤩"
+    "v": "Kafe/kedai kopi"
    },
    {
-    "v": "Tertarik",
-    "e": "🙂"
+    "v": "Warung/restoran"
    },
    {
-    "v": "Kurang tertarik",
-    "e": "😕"
+    "v": "Minimarket"
    },
    {
-    "v": "Tidak tertarik",
-    "e": "🙅"
+    "v": "Mal/pusat belanja"
+   },
+   {
+    "v": "Bengkel"
+   },
+   {
+    "v": "Tempat cuci kendaraan"
+   },
+   {
+    "v": "Toilet umum"
+   },
+   {
+    "v": "Ruang istirahat driver"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   },
+   {
+    "v": "Tidak ada kebutuhan khusus",
+    "fix": true,
+    "x": true
    }
   ]
  },
  {
-  "id": "K2",
-  "key": "K2",
-  "sec": "Layanan langganan",
+  "id": "H3",
+  "key": "H3_minat_diskon",
+  "sec": "Potensi fasilitas dan mitra di sekitar SPKLU",
   "path": "ev",
-  "type": "grid",
-  "shuffleRows": true,
-  "likert": {
-   "min": "Tidak menarik",
-   "max": "Sangat menarik"
-  },
-  "hint": "Pilih angka 1–4 untuk tiap manfaat. 1 = Tidak menarik, 2 = Kurang menarik, 3 = Cukup menarik, 4 = Sangat menarik",
-  "text": "Seberapa menarik tiap manfaat berikut bagi Anda?",
-  "rows": [
+  "type": "single",
+  "text": "Seberapa tertarik Anda pada diskon atau voucher dari tempat usaha di sekitar SPKLU?",
+  "options": [
    {
-    "k": "voucher_kopi",
-    "v": "Voucher kopi atau minuman dari tenant dekat charger"
+    "v": "Sangat tertarik"
    },
    {
-    "k": "voucher_makan",
-    "v": "Voucher makanan dari tenant dekat charger"
+    "v": "Tertarik"
    },
    {
-    "k": "voucher_belanja",
-    "v": "Voucher belanja minimarket atau toko"
+    "v": "Kurang tertarik"
    },
    {
-    "k": "potongan_layanan",
-    "v": "Potongan biaya layanan pengisian daya"
-   },
-   {
-    "k": "poin",
-    "v": "Poin tiap mengisi daya yang bisa ditukar"
-   },
-   {
-    "k": "diskon_bengkel",
-    "v": "Diskon bengkel atau cuci kendaraan"
+    "v": "Tidak tertarik"
    }
-  ],
-  "cols": [
-   "1",
-   "2",
-   "3",
-   "4"
   ]
  },
  {
-  "id": "K3",
-  "key": "K3_manfaat_terpenting",
-  "sec": "Layanan langganan",
+  "id": "H4",
+  "key": "H4_jenis_penawaran",
+  "sec": "Potensi fasilitas dan mitra di sekitar SPKLU",
   "path": "ev",
   "type": "single",
   "shuffle": true,
-  "text": "Kalau hanya boleh memilih satu, manfaat mana yang paling penting bagi Anda?",
+  "text": "Penawaran seperti apa yang paling menarik bagi Anda?",
   "options": [
    {
-    "v": "Voucher kopi atau minuman",
-    "e": "☕"
+    "v": "Diskon langsung saat membayar"
    },
    {
-    "v": "Voucher makanan",
-    "e": "🍜"
+    "v": "Voucher setelah mengisi daya"
    },
    {
-    "v": "Voucher belanja minimarket atau toko",
-    "e": "🏪"
+    "v": "Poin yang dapat dikumpulkan dan ditukar"
    },
    {
-    "v": "Potongan biaya layanan pengisian daya",
-    "e": "⚡"
+    "v": "Paket hemat makanan/minuman"
    },
    {
-    "v": "Poin yang bisa ditukar",
-    "e": "⭐"
-   },
-   {
-    "v": "Diskon bengkel atau cuci kendaraan",
-    "e": "🛠️"
+    "v": "Penawaran pada jam/hari tertentu"
    },
    {
     "v": "Tidak ada yang menarik",
-    "e": "🙅",
-    "fix": true
-   }
-  ]
- },
- {
-  "id": "K4",
-  "key": "K4_jenis_voucher",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "multi",
-  "max": 3,
-  "shuffle": true,
-  "hint": "Pilih maksimal 3",
-  "text": "Voucher dari jenis tenant apa yang paling akan Anda pakai?",
-  "options": [
-   {
-    "v": "Kopi atau minuman",
-    "e": "☕"
-   },
-   {
-    "v": "Makanan berat",
-    "e": "🍛"
-   },
-   {
-    "v": "Camilan atau roti",
-    "e": "🥐"
-   },
-   {
-    "v": "Minimarket",
-    "e": "🏪"
-   },
-   {
-    "v": "Belanja ritel (pakaian, elektronik, dan sejenisnya)",
-    "e": "🛍️"
-   },
-   {
-    "v": "Cuci atau perawatan kendaraan",
-    "e": "🚿"
-   },
-   {
-    "v": "Bioskop atau hiburan",
-    "e": "🎬"
-   },
-   {
-    "v": "Apotek atau kesehatan",
-    "e": "💊"
-   },
-   {
-    "v": "Tidak ada yang saya butuhkan",
-    "e": "🙅",
     "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "K5",
-  "key": "K5_pilihan_paket",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "cards",
-  "shuffle": true,
-  "hint": "Urutan paket diacak. Pilih yang paling sesuai untuk Anda.",
-  "rinci": "Isi paket: Paket Ringan berisi 5 voucher tenant dan poin tiap ngecas; Paket Seimbang berisi 10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas; Paket Lengkap berisi 15 voucher tenant, potongan biaya layanan lebih besar, poin ganda, dan diskon bengkel serta cuci kendaraan.",
-  "text": "Dari contoh paket ini, mana yang paling Anda pilih?",
-  "options": [
-   {
-    "v": "Paket Ringan (Rp99.000 per bulan)",
-    "e": "🌱",
-    "t": "Paket Ringan",
-    "l": [
-     "Rp99.000 per bulan",
-     "5 voucher tenant",
-     "Poin tiap ngecas"
-    ],
-    "rinci": "5 voucher tenant dan poin tiap ngecas"
-   },
-   {
-    "v": "Paket Seimbang (Rp199.000 per bulan)",
-    "e": "⚖️",
-    "t": "Paket Seimbang",
-    "l": [
-     "Rp199.000 per bulan",
-     "10 voucher tenant",
-     "Potongan biaya layanan ngecas",
-     "Poin tiap ngecas"
-    ],
-    "rinci": "10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas"
-   },
-   {
-    "v": "Paket Lengkap (Rp299.000 per bulan)",
-    "e": "🎁",
-    "t": "Paket Lengkap",
-    "l": [
-     "Rp299.000 per bulan",
-     "15 voucher tenant",
-     "Potongan biaya layanan lebih besar",
-     "Poin ganda",
-     "Diskon bengkel dan cuci kendaraan"
-    ],
-    "rinci": "15 voucher tenant, potongan biaya layanan lebih besar, poin ganda, dan diskon bengkel serta cuci kendaraan"
-   },
-   {
-    "v": "Tidak ada yang cocok untuk saya",
-    "e": "🙅",
-    "t": "Tidak ada yang cocok untuk saya",
-    "l": [],
-    "fix": true
-   }
-  ]
- },
- {
-  "id": "K6",
-  "key": "K6",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "grid",
-  "hint": "Pilih satu jawaban untuk tiap harga",
-  "text": "Misalnya Paket Seimbang berisi 10 voucher tenant, potongan biaya layanan ngecas, dan poin tiap ngecas. Apakah Anda akan berlangganan kalau harganya...",
-  "rows": [
-   {
-    "k": "99rb",
-    "v": "Rp99.000 per bulan"
-   },
-   {
-    "k": "149rb",
-    "v": "Rp149.000 per bulan"
-   },
-   {
-    "k": "199rb",
-    "v": "Rp199.000 per bulan"
-   },
-   {
-    "k": "249rb",
-    "v": "Rp249.000 per bulan"
-   },
-   {
-    "k": "299rb",
-    "v": "Rp299.000 per bulan"
-   }
-  ],
-  "cols": [
-   "Pasti berlangganan",
-   "Kemungkinan besar berlangganan",
-   "Kemungkinan kecil berlangganan",
-   "Tidak berlangganan"
-  ]
- },
- {
-  "id": "K7",
-  "key": "K7_cara_bayar",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "single",
-  "text": "Cara membayar langganan mana yang paling cocok untuk Anda?",
-  "options": [
-   {
-    "v": "Dipotong otomatis tiap bulan dari dompet digital atau kartu",
-    "e": "🔄"
-   },
-   {
-    "v": "Bayar manual tiap bulan lewat PLN Mobile",
-    "e": "🗓️"
-   },
-   {
-    "v": "Bayar sekali untuk 3 bulan dengan potongan harga",
-    "e": "📆"
-   },
-   {
-    "v": "Bayar sekali untuk 12 bulan dengan potongan lebih besar",
-    "e": "🎯"
-   },
-   {
-    "v": "Saya tidak yakin",
-    "e": "🤷",
-    "fix": true
-   }
-  ]
- },
- {
-  "id": "K8",
-  "key": "K8_keraguan",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "multi",
-  "max": 2,
-  "shuffle": true,
-  "hint": "Pilih maksimal 2",
-  "text": "Hal apa yang paling membuat Anda ragu berlangganan?",
-  "options": [
-   {
-    "v": "Tenant partner tidak ada di rute saya",
-    "e": "📍"
-   },
-   {
-    "v": "Voucher sulit dipakai atau klaimnya ribet",
-    "e": "🧩"
-   },
-   {
-    "v": "Harga langganan memberatkan",
-    "e": "💸"
-   },
-   {
-    "v": "Saya jarang mengisi daya di charger umum",
-    "e": "🏠"
-   },
-   {
-    "v": "Takut voucher tidak terpakai atau hangus",
-    "e": "⌛"
-   },
-   {
-    "v": "Lebih suka bayar per pengisian tanpa langganan",
-    "e": "🧾"
-   },
-   {
-    "v": "Belum percaya manfaatnya sepadan",
-    "e": "🤔"
-   },
-   {
-    "v": "Tidak ada keraguan",
-    "e": "👌",
-    "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "K9",
-  "key": "K9_perubahan_kebiasaan",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "multi",
-  "max": 2,
-  "shuffle": true,
-  "hint": "Pilih maksimal 2",
-  "text": "Kalau Anda berlangganan, perubahan apa yang mungkin Anda lakukan?",
-  "options": [
-   {
-    "v": "Mengisi daya di charger umum lebih sering",
-    "e": "⚡"
-   },
-   {
-    "v": "Memilih lokasi charger yang ada tenant partner",
-    "e": "📍"
-   },
-   {
-    "v": "Menambah waktu di lokasi charger",
-    "e": "⏱️"
-   },
-   {
-    "v": "Mencoba tenant baru di sekitar charger",
-    "e": "🆕"
-   },
-   {
-    "v": "Mengurangi pengisian daya di rumah",
-    "e": "🏠"
-   },
-   {
-    "v": "Tidak ada perubahan",
-    "e": "🙅",
-    "fix": true,
-    "x": true
-   },
-   {
-    "v": "Saya tidak tahu",
-    "e": "🤷",
-    "fix": true,
-    "x": true
-   }
-  ]
- },
- {
-  "id": "K10",
-  "key": "K10_frekuensi_dengan_langganan",
-  "sec": "Layanan langganan",
-  "path": "ev",
-  "type": "single",
-  "text": "Kalau Anda berlangganan, berapa kali seminggu Anda memperkirakan mengisi daya di charger umum?",
-  "options": [
-   {
-    "v": "Tidak pernah"
-   },
-   {
-    "v": "Kurang dari 1 kali seminggu"
-   },
-   {
-    "v": "1 sampai 2 kali"
-   },
-   {
-    "v": "3 sampai 4 kali"
-   },
-   {
-    "v": "5 kali atau lebih"
+    "x": false
    }
   ]
  },
@@ -1458,27 +2264,35 @@ const Q = [
   "type": "text",
   "required": false,
   "hint": "Boleh dilewati",
-  "text": "Nama atau lokasi charger umum yang paling sering Anda pakai (misalnya nama SPKLU, mal, atau jalan)"
+  "text": "Nama atau lokasi SPKLU/charger umum yang paling sering Anda gunakan"
  },
  {
   "id": "Z2",
-  "key": "Z2_tenant_favorit",
+  "key": "Z2_perbaikan_pln",
   "sec": "Penutup",
   "path": "ev",
   "type": "text",
   "required": false,
-  "hint": "Boleh dilewati",
-  "text": "Nama tenant (kafe, restoran, toko) yang paling sering Anda kunjungi dekat charger"
+  "hint": "Isian terbuka, boleh dilewati",
+  "text": "Jika boleh meminta satu perbaikan dari PLN terkait layanan SPKLU, apa yang paling ingin Anda sampaikan?"
  },
  {
   "id": "Z3",
-  "key": "Z3_masukan",
+  "key": "Z3_bersedia_wawancara",
   "sec": "Penutup",
   "path": "ev",
-  "type": "text",
-  "required": false,
-  "hint": "Boleh dilewati",
-  "text": "Ada masukan lain tentang layanan langganan ini?"
+  "type": "single",
+  "hint": "Kontak diisi secara sukarela, disimpan terpisah, dan tidak digabung dengan jawaban survei",
+  "text": "Apakah Anda bersedia dihubungi untuk wawancara lanjutan?",
+  "options": [
+   {
+    "v": "Bersedia",
+    "kontak": true
+   },
+   {
+    "v": "Tidak bersedia"
+   }
+  ]
  }
 ];
 
@@ -1487,28 +2301,33 @@ const KANAL = (params.get('kanal') || 'langsung').replace(/[^\w-]/g, '').slice(0
 const ADMIN = params.has('admin');
 const KEY_ANTREAN = 'survei-ev-antrean';
 
-const st = { screen: 'welcome', idx: 0, ans: {}, start: 0, consent: false, sent: '', order: {} };
+const st = { screen: 'welcome', idx: 0, ans: {}, start: 0, consent: false, sent: '', order: {}, other: {}, status: '', kontak: '' };
 
 /* ---------- penyimpanan lokal (aman bila diblokir) ---------- */
 function bacaAntrean() { try { return JSON.parse(localStorage.getItem(KEY_ANTREAN) || '[]'); } catch (e) { return []; } }
 function simpanAntrean(list) { try { localStorage.setItem(KEY_ANTREAN, JSON.stringify(list)); } catch (e) { /* abaikan */ } }
 
 /* ---------- alur ---------- */
+function stem(v) { return v.replace(/,?\s*\(?sebutkan\)?/i, '').trim(); }
+/* Responden keluar bila memilih opsi bertanda end (di luar populasi survei). */
+function opsiTerpilih(q) { return (q.options || []).find(o => o.v === st.ans[q.id]); }
+function terlempar() { return Q.find(q => q.type === 'single' && (opsiTerpilih(q) || {}).end); }
 function jalur() {
-  const a = st.ans.A1;
-  if (!a) return null;
-  return a === 'Saya belum pakai kendaraan listrik' ? 'none' : 'ev';
+  if (terlempar()) return 'none';
+  return st.ans.P0 ? 'ev' : null;
 }
 function kondisiOk(q, optimis) {
   if (!q.when) return true;
-  const a = st.ans[q.when.id];
-  if (!a) return !!optimis;
-  return !q.when.ne.includes(a);
+  const w = q.when, a = st.ans[w.id];
+  if (!a) return w.unanswered ? true : !!optimis;   // belum dijawab: tampil hanya bila memang diizinkan
+  if (w.eq) return w.eq.includes(a);
+  if (w.ne) return !w.ne.includes(a);
+  return true;
 }
 function tampil(q, optimis) {
   const p = jalur();
   if (q.path === 'all') return true;
-  if (p === 'none') return false;
+  if (p === 'none') return st.ans[q.id] !== undefined;   // yang sudah dijawab tetap ada, termasuk pertanyaan penyaring yang mengeluarkan
   if (!p && !optimis) return false;
   return kondisiOk(q, optimis);
 }
@@ -1529,7 +2348,7 @@ function acak(arr) {
 /* Opsi bertanda fix tetap di akhir; sisanya diacak sekali per responden. */
 function urutan(q) {
   if (!q.shuffle) return q.options;
-  if (!st.order[q.id]) st.order[q.id] = acak(q.options.filter(o => !o.fix)).concat(q.options.filter(o => o.fix));
+  if (!st.order[q.id]) st.order[q.id] = acak(q.options.filter(o => !o.fix && !o.other)).concat(q.options.filter(o => o.other), q.options.filter(o => o.fix));
   return st.order[q.id];
 }
 function urutanBaris(q) {
@@ -1612,16 +2431,13 @@ function render() {
 
 function layarPembuka(app) {
   setBaterai(0);
-  const mulai = el('button', { class: 'next', disabled: !st.consent, onclick: () => { st.screen = 'q'; st.idx = 0; st.start = Date.now(); render(); } }, 'Mulai isi');
+  const mulai = el('button', { class: 'next', onclick: () => { st.screen = 'q'; st.idx = 0; st.start = Date.now(); render(); } }, 'Mulai isi');
   app.append(el('section', { class: 'hero' },
     maskot(false),
-    el('h1', {}, 'Survei Perilaku dan Kebutuhan Pengguna Kendaraan Listrik'),
-    el('p', {}, 'Halo, Bapak dan Ibu! Kami sedang melakukan riset tentang kendaraan listrik, khususnya kebiasaan dan kebutuhan pengguna saat mengisi daya.'),
-    el('ul', { class: 'facts' }, el('li', {}, '⏱️ Sekitar 7 menit'), el('li', {}, '👆 Sebagian besar tinggal pilih'), el('li', {}, '🙈 Tanpa nama')),
-    el('label', { class: 'consent' },
-      el('input', { type: 'checkbox', checked: st.consent, onchange: e => { st.consent = e.target.checked; mulai.disabled = !st.consent; } }),
-      el('span', {}, 'Saya bersedia mengisi, dan jawaban saya boleh dipakai untuk riset.')),
-    el('p', { class: 'small' }, 'Tidak ada jawaban benar atau salah.')
+    el('h1', { class: 'judul-panjang' }, 'Survei Perilaku, Pengalaman, dan Kebutuhan Driver Kendaraan Listrik terhadap Layanan Charger Umum (SPKLU) di Jabodetabek'),
+    el('p', {}, 'Halo, Bapak/Ibu/Kak. Kami sedang melakukan riset mengenai pengalaman driver transportasi online pengguna kendaraan listrik saat mengisi daya, khususnya layanan charger umum/SPKLU di wilayah Jabodetabek. Hasil riset akan digunakan untuk memahami kebutuhan pengguna dan merumuskan peluang perbaikan layanan.'),
+    el('ul', { class: 'facts' }, el('li', {}, '⏱️ Sekitar 10–12 menit'), el('li', {}, '👆 Sebagian besar tinggal pilih'), el('li', {}, '🙈 Tanpa nama')),
+    el('p', { class: 'small' }, 'Survei ini tidak meminta nama dan tidak ada jawaban benar atau salah. Jawablah berdasarkan pengalaman Anda sendiri. Data akan dianalisis untuk keperluan riset.')
   ));
   navigasi([mulai]);
 }
@@ -1652,6 +2468,15 @@ function layarPertanyaan(app) {
 
   if (q.type === 'single' || q.type === 'cards') {
     const opts = el('div', { class: 'opts', role: 'group', 'aria-label': q.text });
+    const adaLain = q.options.some(o => o.other);
+    const ketSingle = adaLain ? el('input', { class: 'field', type: 'text', maxlength: '80', placeholder: 'Tulis singkat', 'aria-label': 'Sebutkan lainnya', value: st.other[q.id] || '',
+      oninput: e => { st.other[q.id] = e.target.value.trim(); } }) : null;
+    if (ketSingle) ketSingle.hidden = !(opsiTerpilih(q) || {}).other;
+    const adaKontak = q.options.some(o => o.kontak);
+    const kotakKontak = adaKontak ? el('div', {}, el('input', { class: 'field', type: 'text', maxlength: '80', placeholder: 'Nomor WhatsApp atau email (boleh dikosongkan)', 'aria-label': 'Kontak untuk wawancara lanjutan', value: st.kontak || '',
+        oninput: e => { st.kontak = e.target.value.trim(); } }),
+      el('p', { class: 'small' }, 'Kontak disimpan terpisah dan tidak digabung dengan jawaban survei.')) : null;
+    if (kotakKontak) kotakKontak.hidden = !(opsiTerpilih(q) || {}).kontak;
     urutan(q).forEach(o => {
       const on = st.ans[q.id] === o.v;
       const isi = q.type === 'cards'
@@ -1668,14 +2493,19 @@ function layarPertanyaan(app) {
           const btn = e.currentTarget;
           btn.setAttribute('aria-pressed', 'true');
           const t = btn.querySelector('.tick'); if (t) t.textContent = '✓';
+          if (ketSingle) { ketSingle.hidden = !o.other; if (o.other) ketSingle.focus(); }
+          if (kotakKontak) kotakKontak.hidden = !o.kontak;
           segarkanNext();
-          const di = st.idx;
           clearTimeout(st.timer);
+          if (o.other) return;   // beri waktu mengetik, lanjut lewat tombol
+          const di = st.idx;
           st.timer = setTimeout(() => { if (st.screen === 'q' && st.idx === di) maju(); }, 280);
         }
       }, ...isi));
     });
     box.append(opts);
+    if (ketSingle) box.append(ketSingle);
+    if (kotakKontak) box.append(kotakKontak);
   }
 
   if (q.type === 'multi') {
@@ -1684,8 +2514,12 @@ function layarPertanyaan(app) {
     const opts = el('div', { class: 'opts multi', role: 'group', 'aria-label': q.text });
     const hitung = el('p', { class: 'count' });
     const xs = new Set(q.options.filter(o => o.x).map(o => o.v));
+    const lain = q.options.find(o => o.other);
+    const ketMulti = lain ? el('input', { class: 'field', type: 'text', maxlength: '80', placeholder: 'Tulis singkat', 'aria-label': 'Sebutkan lainnya', value: st.other[q.id] || '',
+      oninput: e => { st.other[q.id] = e.target.value.trim(); } }) : null;
     const segarkan = () => {
       const now = st.ans[q.id] || [];
+      if (ketMulti) ketMulti.hidden = !now.includes(lain.v);
       const adaX = now.some(v => xs.has(v));
       [...opts.children].forEach(b => {
         const on = now.includes(b.dataset.v);
@@ -1714,6 +2548,7 @@ function layarPertanyaan(app) {
       }, o.e ? el('span', { class: 'emo' }, o.e) : null, el('span', {}, o.v), el('span', { class: 'tick', 'aria-hidden': 'true' })));
     });
     box.append(opts, hitung);
+    if (ketMulti) box.append(ketMulti);
     setTimeout(segarkan);
   }
 
@@ -1734,7 +2569,18 @@ function layarPertanyaan(app) {
           }
         }, c));
       });
-      row.append(el('p', { class: 'glabel' }, r.v), pills, q.likert ? el('div', { class: 'ends', 'aria-hidden': 'true' }, el('span', {}, '1 = ' + q.likert.min), el('span', {}, '4 = ' + q.likert.max)) : null);
+      const tombolNa = q.na ? el('button', {
+        class: 'pill na', 'aria-pressed': a[r.k] === q.na ? 'true' : 'false',
+        onclick: () => {
+          a[r.k] = q.na;
+          [...pills.children].forEach(b => b.setAttribute('aria-pressed', 'false'));
+          tombolNa.setAttribute('aria-pressed', 'true');
+          row.classList.add('done');
+          segarkanNext();
+        }
+      }, q.na) : null;
+      if (tombolNa) pills.querySelectorAll('.pill').forEach(b => b.addEventListener('click', () => tombolNa.setAttribute('aria-pressed', 'false')));
+      row.append(el('p', { class: 'glabel' }, r.v), pills, q.likert ? el('div', { class: 'ends', 'aria-hidden': 'true' }, el('span', {}, '1 = ' + q.likert.min), el('span', {}, '4 = ' + q.likert.max)) : null, tombolNa);
       wrap.append(row);
     });
     box.append(wrap);
@@ -1760,7 +2606,7 @@ function maju() {
   const list = alur();
   const q = list[st.idx];
   if (!q || !terjawab(q)) return;
-  if (q.id === 'A1' && jalur() === 'none') { kirim(); st.screen = 'notev'; return render(); }
+  if (q.type === 'single' && (opsiTerpilih(q) || {}).end) { st.status = 'keluar_' + q.id; kirim(); st.screen = 'notev'; return render(); }
   if (st.idx < alur().length - 1) { st.idx++; render(); }
   else { kirim(); st.screen = 'end'; render(); }
 }
@@ -1782,12 +2628,14 @@ function layarAkhir(app) {
   const bukanEv = st.screen === 'notev';
   const pesan = !KONFIG.SCRIPT_URL ? 'Mode uji: jawaban ini tidak dikirim ke spreadsheet.'
     : st.sent === 'ok' ? 'Jawaban Anda sudah terkirim.'
-    : st.sent === 'antre' ? 'Sinyal sedang lemah. Jawaban tersimpan di HP ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.'
+    : st.sent === 'antre' ? 'Sinyal sedang lemah. Jawaban tersimpan di ponsel ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.'
     : 'Sedang mengirim jawaban...';
   app.append(el('section', { class: 'end' },
     maskot(true),
-    el('h1', {}, bukanEv ? 'Terima kasih sudah mampir!' : 'Terima kasih, Bapak dan Ibu!'),
-    el('p', {}, bukanEv ? 'Survei ini khusus pengguna kendaraan listrik.' : 'Jawaban Anda membantu kami merancang tempat pengisian daya yang lebih sesuai dengan kebutuhan driver.'),
+    el('h1', {}, bukanEv ? 'Terima kasih sudah mampir!' : 'Terima kasih, Bapak/Ibu/Kak!'),
+    el('p', {}, st.status === 'keluar_P0' ? 'Terima kasih atas waktunya. Anda memilih tidak berpartisipasi.'
+      : bukanEv ? 'Survei ini khusus driver transportasi online aktif di Jabodetabek yang memakai kendaraan listrik untuk bekerja dan berusia 17 tahun ke atas.'
+      : 'Jawaban Anda membantu kami memahami pengalaman driver dan merumuskan perbaikan layanan charger umum.'),
     el('p', { class: 'small', id: 'statusKirim' }, pesan)
   ));
   if (!bukanEv) konfeti();
@@ -1816,15 +2664,17 @@ function payload() {
   const j = jalur();
   const p = {
     id_respons: idAcak(), kanal: KANAL,
-    jalur: j === 'ev' ? ({ 'Mobil listrik': 'mobil', 'Motor listrik': 'motor', 'Mobil dan motor listrik': 'mobil_motor' }[st.ans.A1] || 'ev') : 'bukan_ev',
-    durasi_detik: Math.round((Date.now() - st.start) / 1000), persetujuan: 'Ya'
+    jalur: j === 'ev' ? ({ 'Mobil listrik': 'mobil', 'Motor listrik': 'motor' }[st.ans.A4] || 'ev') : 'keluar',
+    durasi_detik: Math.round((Date.now() - st.start) / 1000), persetujuan: st.ans.P0 === 'Ya, bersedia' ? 'Ya' : 'Tidak', status_saring: st.status || 'lolos'
   };
-  alur().forEach(q => {
+  const nilai = (q, v) => { const o = (q.options || []).find(x => x.v === v); return o && o.other ? (stem(v) + (st.other[q.id] ? ': ' + st.other[q.id] : '')) : v; };
+  const daftar = j === 'ev' ? alur() : Q.filter(q => st.ans[q.id] !== undefined);
+  daftar.forEach(q => {
     if (q.type === 'concept') return;
     const a = st.ans[q.id];
     if (q.type === 'grid') q.rows.forEach(r => { p[q.key + '_' + r.k] = (a && a[r.k]) || ''; });
-    else if (q.type === 'multi') p[q.key] = (a || []).join('; ');
-    else p[q.key] = a || '';
+    else if (q.type === 'multi') p[q.key] = (a || []).map(v => nilai(q, v)).join('; ');
+    else p[q.key] = a ? nilai(q, a) : '';
   });
   return p;
 }
@@ -1838,19 +2688,21 @@ function kirimSatu(data) {
 async function kirim() {
   if (!KONFIG.SCRIPT_URL) return;
   const data = payload();
-  simpanAntrean(bacaAntrean().concat([data]));
+  const baru = [data];
+  if (st.ans.Z3 === 'Bersedia' && st.kontak) baru.push({ tipe: 'kontak', kontak: st.kontak });
+  simpanAntrean(bacaAntrean().concat(baru));
   st.sent = '';
   await kirimAntrean();
   const status = document.getElementById('statusKirim');
   if (status) status.textContent = st.sent === 'ok' ? 'Jawaban Anda sudah terkirim.'
-    : 'Sinyal sedang lemah. Jawaban tersimpan di HP ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.';
+    : 'Sinyal sedang lemah. Jawaban tersimpan di ponsel ini dan akan dikirim lagi otomatis saat halaman ini dibuka kembali.';
 }
 async function kirimAntrean() {
   let list = bacaAntrean();
   for (const item of list.slice()) {
     try {
       await kirimSatu(item);
-      list = list.filter(x => x.id_respons !== item.id_respons);
+      list = list.filter(x => x !== item);
       simpanAntrean(list);
       st.sent = 'ok';
     } catch (e) {
