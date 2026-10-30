@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Survei Driver Kendaraan Listrik dan Layanan Charger Umum (SPKLU)</title>
-<meta name="description" content="Survei untuk driver transportasi online pengguna kendaraan listrik di Jabodetabek. Sekitar 10–12 menit, sebagian besar tinggal pilih jawaban.">
+<meta name="description" content="Survei untuk driver transportasi online pengguna kendaraan listrik di Jabodetabek. Sekitar 12–15 menit, sebagian besar tinggal pilih jawaban.">
 <meta name="theme-color" content="#2340FF">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -285,15 +285,77 @@ const Q = [
  },
  {
   "id": "A4b",
-  "key": "A4b_merk_model",
+  "key": "A4b_merek_mobil",
   "sec": "Penyaringan dan profil responden",
   "path": "ev",
-  "type": "text",
-  "input": "text",
-  "maxlen": 80,
-  "placeholder": "Merek dan model",
-  "hint": "Tuliskan merek dan model sesuai yang tertera pada kendaraan",
-  "text": "Apa merek dan model kendaraan listrik yang Anda gunakan untuk bekerja?"
+  "when": {
+   "id": "A4",
+   "eq": [
+    "Mobil listrik"
+   ]
+  },
+  "type": "single",
+  "shuffle": true,
+  "text": "Apa merek mobil listrik yang Anda gunakan untuk bekerja?",
+  "options": [
+   {
+    "v": "BYD"
+   },
+   {
+    "v": "Jaecoo"
+   },
+   {
+    "v": "Geely"
+   },
+   {
+    "v": "Wuling"
+   },
+   {
+    "v": "GAC (Aion)"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
+ },
+ {
+  "id": "A4c",
+  "key": "A4c_merek_motor",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "when": {
+   "id": "A4",
+   "eq": [
+    "Motor listrik"
+   ]
+  },
+  "type": "single",
+  "shuffle": true,
+  "text": "Apa merek motor listrik yang Anda gunakan untuk bekerja?",
+  "options": [
+   {
+    "v": "Polytron"
+   },
+   {
+    "v": "United"
+   },
+   {
+    "v": "Alva"
+   },
+   {
+    "v": "Gesits"
+   },
+   {
+    "v": "Volta"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   }
+  ]
  },
  {
   "id": "A5",
@@ -2269,6 +2331,342 @@ const Q = [
   ]
  },
  {
+  "id": "K0",
+  "key": "",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "concept",
+  "text": "Gambaran layanan langganan dengan lifestyle bonus",
+  "konsep": {
+   "judul": "Gambaran layanan langganan dengan lifestyle bonus",
+   "isi": "Layanan ini masih dalam tahap rancangan, jadi isinya hanya contoh. Anda membayar biaya bulanan tetap lewat aplikasi PLN Mobile, lalu mendapat paket manfaat, termasuk lifestyle bonus berupa voucher dan diskon dari tempat usaha di sekitar charger. Bacalah sebentar, lalu jawab pertanyaan berikutnya.",
+   "fitur": [
+    {
+     "e": "🎟️",
+     "t": "Lifestyle bonus: voucher kafe, restoran, dan toko",
+     "d": "Voucher untuk kafe, restoran, dan toko di sekitar lokasi charger. Nilai satu voucher sekitar Rp25.000. Tersedia di lokasi tertentu."
+    },
+    {
+     "e": "⚡",
+     "t": "Potongan biaya layanan",
+     "d": "Potongan dari biaya layanan pengisian daya di charger PLN."
+    },
+    {
+     "e": "⭐",
+     "t": "Poin",
+     "d": "Setiap mengisi daya menghasilkan poin yang bisa ditukar."
+    },
+    {
+     "e": "🛠️",
+     "t": "Diskon perawatan kendaraan",
+     "d": "Potongan harga di bengkel atau tempat cuci kendaraan mitra."
+    }
+   ],
+   "catatan": "Isi dan harga paket di pertanyaan berikutnya hanya contoh untuk meminta pendapat Anda, belum final."
+  }
+ },
+ {
+  "id": "K1",
+  "key": "K1_minat",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "single",
+  "text": "Seberapa tertarik Anda dengan layanan langganan seperti ini?",
+  "options": [
+   {
+    "v": "Sangat tertarik"
+   },
+   {
+    "v": "Tertarik"
+   },
+   {
+    "v": "Kurang tertarik"
+   },
+   {
+    "v": "Tidak tertarik"
+   }
+  ]
+ },
+ {
+  "id": "K2",
+  "key": "K2",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "grid",
+  "shuffleRows": true,
+  "likert": {
+   "min": "Tidak menarik",
+   "max": "Sangat menarik"
+  },
+  "hint": "Pilih angka 1–4 untuk tiap manfaat. 1 = Tidak menarik, 2 = Kurang menarik, 3 = Cukup menarik, 4 = Sangat menarik",
+  "text": "Seberapa menarik tiap manfaat berikut bagi Anda?",
+  "rows": [
+   {
+    "k": "voucher_kopi",
+    "v": "Voucher kopi atau minuman dari kafe dekat charger"
+   },
+   {
+    "k": "voucher_makan",
+    "v": "Voucher makanan dari restoran atau warung dekat charger"
+   },
+   {
+    "k": "voucher_belanja",
+    "v": "Voucher belanja di minimarket atau toko"
+   },
+   {
+    "k": "potongan_layanan",
+    "v": "Potongan biaya layanan pengisian daya"
+   },
+   {
+    "k": "poin",
+    "v": "Poin setiap mengisi daya yang bisa ditukar"
+   },
+   {
+    "k": "diskon_bengkel",
+    "v": "Diskon bengkel"
+   },
+   {
+    "k": "diskon_cuci",
+    "v": "Diskon cuci kendaraan"
+   }
+  ],
+  "cols": [
+   "1",
+   "2",
+   "3",
+   "4"
+  ]
+ },
+ {
+  "id": "K3",
+  "key": "K3_pilihan_paket",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "cards",
+  "shuffle": true,
+  "hint": "Urutan paket diacak. Pilih yang paling sesuai untuk Anda.",
+  "rinci": "Isi paket: Paket Ringan berisi 5 voucher kafe, restoran, atau toko dan poin setiap mengisi daya; Paket Seimbang berisi 10 voucher kafe, restoran, atau toko, potongan biaya layanan pengisian daya, dan poin setiap mengisi daya; Paket Lengkap berisi 15 voucher kafe, restoran, atau toko, potongan biaya layanan pengisian daya yang lebih besar, poin ganda, serta diskon bengkel dan cuci kendaraan.",
+  "text": "Dari contoh paket ini, mana yang paling Anda pilih?",
+  "options": [
+   {
+    "v": "Paket Ringan (Rp99.000 per bulan)",
+    "e": "🌱",
+    "t": "Paket Ringan",
+    "l": [
+     "Rp99.000 per bulan",
+     "5 voucher kafe, restoran, atau toko",
+     "Poin setiap mengisi daya"
+    ],
+    "rinci": "5 voucher kafe, restoran, atau toko dan poin setiap mengisi daya"
+   },
+   {
+    "v": "Paket Seimbang (Rp199.000 per bulan)",
+    "e": "⚖️",
+    "t": "Paket Seimbang",
+    "l": [
+     "Rp199.000 per bulan",
+     "10 voucher kafe, restoran, atau toko",
+     "Potongan biaya layanan pengisian daya",
+     "Poin setiap mengisi daya"
+    ],
+    "rinci": "10 voucher kafe, restoran, atau toko, potongan biaya layanan pengisian daya, dan poin setiap mengisi daya"
+   },
+   {
+    "v": "Paket Lengkap (Rp299.000 per bulan)",
+    "e": "🎁",
+    "t": "Paket Lengkap",
+    "l": [
+     "Rp299.000 per bulan",
+     "15 voucher kafe, restoran, atau toko",
+     "Potongan biaya layanan pengisian daya yang lebih besar",
+     "Poin ganda",
+     "Diskon bengkel dan diskon cuci kendaraan"
+    ],
+    "rinci": "15 voucher kafe, restoran, atau toko, potongan biaya layanan pengisian daya yang lebih besar, poin ganda, serta diskon bengkel dan cuci kendaraan"
+   },
+   {
+    "v": "Tidak ada yang cocok untuk saya",
+    "e": "🙅",
+    "t": "Tidak ada yang cocok untuk saya",
+    "l": [],
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "K4",
+  "key": "K4",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "grid",
+  "hint": "Pilih satu jawaban untuk tiap harga",
+  "text": "Misalnya Paket Seimbang berisi 10 voucher kafe, restoran, atau toko, potongan biaya layanan pengisian daya, dan poin setiap mengisi daya. Apakah Anda akan berlangganan kalau harganya...",
+  "rows": [
+   {
+    "k": "99rb",
+    "v": "Rp99.000 per bulan"
+   },
+   {
+    "k": "149rb",
+    "v": "Rp149.000 per bulan"
+   },
+   {
+    "k": "199rb",
+    "v": "Rp199.000 per bulan"
+   },
+   {
+    "k": "249rb",
+    "v": "Rp249.000 per bulan"
+   },
+   {
+    "k": "299rb",
+    "v": "Rp299.000 per bulan"
+   }
+  ],
+  "cols": [
+   "Pasti berlangganan",
+   "Kemungkinan besar berlangganan",
+   "Kemungkinan kecil berlangganan",
+   "Tidak berlangganan"
+  ]
+ },
+ {
+  "id": "K5",
+  "key": "K5_cara_bayar",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "single",
+  "text": "Cara membayar langganan mana yang paling cocok untuk Anda?",
+  "options": [
+   {
+    "v": "Dipotong otomatis tiap bulan dari dompet digital atau kartu"
+   },
+   {
+    "v": "Bayar manual tiap bulan lewat PLN Mobile"
+   },
+   {
+    "v": "Bayar sekali untuk 3 bulan dengan potongan harga"
+   },
+   {
+    "v": "Bayar sekali untuk 12 bulan dengan potongan lebih besar"
+   },
+   {
+    "v": "Saya tidak yakin",
+    "fix": true
+   }
+  ]
+ },
+ {
+  "id": "K6",
+  "key": "K6_keraguan",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Seandainya Anda mempertimbangkan berlangganan, hal apa yang paling membuat Anda ragu?",
+  "options": [
+   {
+    "v": "Kafe, restoran, atau toko mitra tidak ada di rute saya"
+   },
+   {
+    "v": "Voucher sulit dipakai"
+   },
+   {
+    "v": "Cara klaim voucher rumit"
+   },
+   {
+    "v": "Harga langganan memberatkan"
+   },
+   {
+    "v": "Saya jarang mengisi daya di charger umum"
+   },
+   {
+    "v": "Takut voucher tidak terpakai"
+   },
+   {
+    "v": "Lebih suka bayar per pengisian tanpa langganan"
+   },
+   {
+    "v": "Belum percaya manfaatnya sepadan"
+   },
+   {
+    "v": "Lainnya",
+    "other": true,
+    "fix": false
+   },
+   {
+    "v": "Tidak ada keraguan",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K7",
+  "key": "K7_perubahan_kebiasaan",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "multi",
+  "max": 2,
+  "shuffle": true,
+  "hint": "Pilih maksimal 2",
+  "text": "Seandainya Anda berlangganan, apa yang mungkin berubah dari kebiasaan Anda?",
+  "options": [
+   {
+    "v": "Mengisi daya di charger umum lebih sering"
+   },
+   {
+    "v": "Memilih lokasi charger yang ada kafe, restoran, atau toko mitra"
+   },
+   {
+    "v": "Menambah waktu di lokasi charger"
+   },
+   {
+    "v": "Mencoba tempat baru di sekitar charger"
+   },
+   {
+    "v": "Mengurangi pengisian daya di rumah"
+   },
+   {
+    "v": "Tidak ada perubahan",
+    "fix": true,
+    "x": true
+   },
+   {
+    "v": "Saya tidak tahu",
+    "fix": true,
+    "x": true
+   }
+  ]
+ },
+ {
+  "id": "K8",
+  "key": "K8_frekuensi_dengan_langganan",
+  "sec": "Layanan langganan dengan lifestyle bonus",
+  "path": "ev",
+  "type": "single",
+  "text": "Seandainya Anda berlangganan, berapa kali seminggu Anda memperkirakan mengisi daya di charger umum?",
+  "options": [
+   {
+    "v": "Tidak pernah"
+   },
+   {
+    "v": "Kurang dari 1 kali per minggu"
+   },
+   {
+    "v": "1–2 kali per minggu"
+   },
+   {
+    "v": "3–4 kali per minggu"
+   },
+   {
+    "v": "5 kali atau lebih per minggu"
+   }
+  ]
+ },
+ {
   "id": "Z1",
   "key": "Z1_lokasi_charger",
   "sec": "Penutup",
@@ -2290,25 +2688,7 @@ const Q = [
  },
  {
   "id": "Z3",
-  "key": "Z3_bersedia_wawancara",
-  "sec": "Penutup",
-  "path": "ev",
-  "type": "single",
-  "hint": "Kontak diisi secara sukarela, disimpan terpisah, dan tidak digabung dengan jawaban survei",
-  "text": "Apakah Anda bersedia dihubungi untuk wawancara lanjutan?",
-  "options": [
-   {
-    "v": "Bersedia",
-    "kontak": true
-   },
-   {
-    "v": "Tidak bersedia"
-   }
-  ]
- },
- {
-  "id": "Z4",
-  "key": "Z4_nomor_hadiah",
+  "key": "Z3_nomor_whatsapp",
   "sec": "Penutup",
   "path": "ev",
   "type": "text",
@@ -2464,7 +2844,7 @@ function layarPembuka(app) {
     maskot(false),
     el('h1', { class: 'judul-panjang' }, 'Survei Perilaku, Pengalaman, dan Kebutuhan Driver Kendaraan Listrik terhadap Layanan Charger Umum (SPKLU) di Jabodetabek'),
     el('p', {}, 'Halo, Bapak/Ibu/Kak. Kami sedang melakukan riset mengenai pengalaman driver transportasi online pengguna kendaraan listrik saat mengisi daya, khususnya layanan charger umum/SPKLU di wilayah Jabodetabek. Hasil riset akan digunakan untuk memahami kebutuhan pengguna dan merumuskan peluang perbaikan layanan.'),
-    el('ul', { class: 'facts' }, el('li', {}, '⏱️ Sekitar 10–12 menit'), el('li', {}, '👆 Sebagian besar tinggal pilih'), el('li', {}, '🙈 Tanpa nama')),
+    el('ul', { class: 'facts' }, el('li', {}, '⏱️ Sekitar 12–15 menit'), el('li', {}, '👆 Sebagian besar tinggal pilih'), el('li', {}, '🙈 Tanpa nama')),
     el('p', { class: 'small' }, 'Survei ini tidak meminta nama dan tidak ada jawaban benar atau salah. Jawablah berdasarkan pengalaman Anda sendiri. Data akan dianalisis untuk keperluan riset.')
   ));
   navigasi([mulai]);
@@ -2721,9 +3101,8 @@ async function kirim() {
   if (!KONFIG.SCRIPT_URL) return;
   const data = payload();
   const baru = [data];
-  if (st.ans.Z3 === 'Bersedia' && st.kontak) baru.push({ tipe: 'kontak', kontak: st.kontak });
-  const wa = (st.ans.Z4 || '').replace(/[^0-9+]/g, '');
-  if (wa) baru.push({ tipe: 'hadiah', kontak: wa });   // nomor hadiah dikirim terpisah, tanpa id responden
+  const wa = (st.ans.Z3 || '').replace(/[^0-9+]/g, '');
+  if (wa) baru.push({ tipe: 'kontak', kontak: wa });   // nomor WhatsApp dikirim terpisah, tanpa id responden
   simpanAntrean(bacaAntrean().concat(baru));
   st.sent = '';
   await kirimAntrean();
