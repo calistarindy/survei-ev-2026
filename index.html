@@ -163,7 +163,7 @@ textarea.field{min-height:120px;resize:vertical}
 /* ===== Pengaturan: ubah dua baris ini sebelum disebar ===== */
 const KONFIG = {
   // Tempel URL Web App dari Apps Script (berakhiran /exec). Kosong = mode uji.
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzYlZE68yzLILaYag64F_ZOakq_FT-2_Nk3uH3BD4jUZR37Miv_5c9w6SKvORC6v8PE/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyR_T5dhA_rV8YycTGdp_fC_1yeWO3dtWaPwbZtvkw0a0EhkxSo8oOiEqV5m01wz70k/exec'
 };
 /* ========================================================= */
 
@@ -282,6 +282,18 @@ const Q = [
     "v": "Motor listrik"
    }
   ]
+ },
+ {
+  "id": "A4b",
+  "key": "A4b_merk_model",
+  "sec": "Penyaringan dan profil responden",
+  "path": "ev",
+  "type": "text",
+  "input": "text",
+  "maxlen": 80,
+  "placeholder": "Merek dan model",
+  "hint": "Tuliskan merek dan model sesuai yang tertera pada kendaraan",
+  "text": "Apa merek dan model kendaraan listrik yang Anda gunakan untuk bekerja?"
  },
  {
   "id": "A5",
@@ -2293,6 +2305,21 @@ const Q = [
     "v": "Tidak bersedia"
    }
   ]
+ },
+ {
+  "id": "Z4",
+  "key": "Z4_nomor_hadiah",
+  "sec": "Penutup",
+  "path": "ev",
+  "type": "text",
+  "input": "tel",
+  "maxlen": 20,
+  "required": false,
+  "pisah": true,
+  "pola": "^\\+?[0-9 \\-]{8,16}$",
+  "placeholder": "Nomor WhatsApp (opsional)",
+  "hint": "Opsional. Nomor hanya dipakai untuk menghubungi terkait hadiah, disimpan terpisah, dan tidak digabung dengan jawaban survei",
+  "text": "Jika tertarik mendapatkan hadiah dengan total Rp250.000, silakan isi nomor WhatsApp Anda."
  }
 ];
 
@@ -2335,6 +2362,7 @@ function alur() { return Q.filter(q => tampil(q, false)); }
 function totalLayar() { return jalur() === 'none' ? alur().length : Q.filter(q => tampil(q, true)).length; }
 function terjawab(q) {
   const a = st.ans[q.id];
+  if (q.type === 'text' && q.pola && a && !new RegExp(q.pola).test(a)) return false;
   if (q.type === 'concept' || q.required === false) return true;
   if (q.type === 'multi') return Array.isArray(a) && a.length > 0;
   if (q.type === 'grid') return !!a && q.rows.every(r => a[r.k]);
@@ -2451,8 +2479,10 @@ function layarPertanyaan(app) {
   const judul = el('h1', { class: 'q-title', tabindex: '-1' }, q.text);
   const box = el('section', {}, el('p', { class: 'sec' }, q.sec), judul, q.hint ? el('p', { class: 'hint' }, q.hint) : null);
   const next = el('button', { class: 'next', onclick: maju });
+  let pesanPola = null;
   const segarkanNext = () => {
     next.disabled = !terjawab(q);
+    if (pesanPola) pesanPola.hidden = !(st.ans[q.id] && !terjawab(q));
     const kosong = q.required === false && !st.ans[q.id];
     next.textContent = st.idx === list.length - 1 ? 'Kirim jawaban' : kosong ? 'Lewati' : 'Lanjut';
   };
@@ -2587,10 +2617,12 @@ function layarPertanyaan(app) {
   }
 
   if (q.type === 'text') {
-    box.append(el('textarea', {
-      class: 'field', maxlength: '300', placeholder: 'Tulis singkat saja', 'aria-label': q.text,
-      oninput: e => { st.ans[q.id] = e.target.value.trim(); segarkanNext(); }
-    }, st.ans[q.id] || ''));
+    const sifat = { class: 'field', maxlength: String(q.maxlen || 300), placeholder: q.placeholder || 'Tulis singkat saja', 'aria-label': q.text,
+      oninput: e => { st.ans[q.id] = e.target.value.trim(); segarkanNext(); } };
+    if (q.input) {
+      box.append(el('input', Object.assign({ type: q.input, value: st.ans[q.id] || '', autocomplete: 'off', inputmode: q.input === 'tel' ? 'tel' : 'text' }, sifat)));
+      if (q.pola) { pesanPola = el('p', { class: 'hint' }, 'Nomor belum sesuai. Isi angka saja (8 sampai 16 digit), atau kosongkan bila tidak ingin mengisi.'); pesanPola.hidden = true; box.append(pesanPola); }
+    } else box.append(el('textarea', sifat, st.ans[q.id] || ''));
   }
 
   app.append(box);
@@ -2670,7 +2702,7 @@ function payload() {
   const nilai = (q, v) => { const o = (q.options || []).find(x => x.v === v); return o && o.other ? (stem(v) + (st.other[q.id] ? ': ' + st.other[q.id] : '')) : v; };
   const daftar = j === 'ev' ? alur() : Q.filter(q => st.ans[q.id] !== undefined);
   daftar.forEach(q => {
-    if (q.type === 'concept') return;
+    if (q.type === 'concept' || q.pisah) return;
     const a = st.ans[q.id];
     if (q.type === 'grid') q.rows.forEach(r => { p[q.key + '_' + r.k] = (a && a[r.k]) || ''; });
     else if (q.type === 'multi') p[q.key] = (a || []).map(v => nilai(q, v)).join('; ');
@@ -2690,6 +2722,8 @@ async function kirim() {
   const data = payload();
   const baru = [data];
   if (st.ans.Z3 === 'Bersedia' && st.kontak) baru.push({ tipe: 'kontak', kontak: st.kontak });
+  const wa = (st.ans.Z4 || '').replace(/[^0-9+]/g, '');
+  if (wa) baru.push({ tipe: 'hadiah', kontak: wa });   // nomor hadiah dikirim terpisah, tanpa id responden
   simpanAntrean(bacaAntrean().concat(baru));
   st.sent = '';
   await kirimAntrean();
